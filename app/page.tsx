@@ -2,44 +2,43 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="bg-gray-300 flex justify-center items-center h-screen dark:bg-slate-700">
-      <div className="bg-white rounded-2xl shadow-2xl p-3.5 dark:bg-slate-600">
-        <div>
-          <div className="flex justify-between">
-            <div className="flex flex-col">
-              <span className="text-gray-600 font-semibold -mb-1 dark:text-gray-300">
-                In transit
-              </span>
-              <span className="text-4xl font-semibold dark:text-white">
-                Coolblue
-              </span>
-            </div>
-            <div className="size-12 bg-orange-600 rounded-full flex text-white items-center justify-center font-semibold text-sm ">
-              <span>
-                cool
-                <br />
-                blue
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="bg-green-400 text-white uppercase px-2 py-1 rounded-full text-xs transition-all hover:bg-green-500">
-              Today
-            </span>
-            <span className="dark:text-white">9:30-10:30u</span>
-          </div>
-          <div className="relative">
-            <div className="absolute w-full bg-gray-200 rounded-full h-2" />
-            <div className="absolute w-3/4 bg-green-500 rounded-full h-2" />
-          </div>
-          <div className="dark:text-slate-400 whitespace-nowrap flex justify-between items-center mt-5 text-gray-600 gap-3">
-            <span>Expected</span>
-            <span>Sorting Center</span>
-            <span>In transit</span>
-            <span className="text-gray-400 dark:text-slate-500">Deilvered</span>
-          </div>
+    <main className="bg-gray-600 h-screen flex items-center justify-center p-5">
+      <form className="bg-white p-3 rounded-2xl max-w-screen-lg">
+        <div className="my-3 flex flex-col gap-2">
+          <input
+            type="email"
+            placeholder="email"
+            required
+            className="px-5 py-2 bg-slate-200 rounded-full w-full 
+            ring ring-transparent focus:ring-green-500 
+            focus:ring-offset-2 transition-shadow
+             invalid:focus:ring-red-600 outline-none peer"
+          />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="password"
+            minLength={5}
+            required
+            className="px-5 py-2 bg-slate-200 rounded-full w-full outline-none 
+            ring ring-transparent ring-offset-2 transition-shadow
+             focus:ring-green-500 invalid:focus:ring-red-500
+            
+            "
+          />
+          <span className=" text-red-500 font-medium hidden peer-invalid:block ">
+            Email is required.
+          </span>
         </div>
-      </div>
+
+        <button
+          type="submit"
+          className="bg-black text-white w-full rounded-full py-2 font-bold"
+        >
+          Log in
+        </button>
+      </form>
     </main>
   );
 }
