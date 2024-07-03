@@ -5,7 +5,9 @@ export default function Home() {
         <input type="email" placeholder="Write email" />
         <span className="group-focus-within:block hidden">email focus</span>
 
-        <button type="submit">submit</button>
+        <button type="submit" className="bg-tomato rounded-round-144">
+          submit
+        </button>
       </form>
     </main>
   );
