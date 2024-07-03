@@ -3,8 +3,14 @@ import Image from "next/image";
 export default function Home() {
   return (
     <main className="bg-gray-600 h-screen flex items-center justify-center p-5">
-      <form className="bg-white p-3 rounded-2xl max-w-screen-lg">
-        <div className="my-3 flex flex-col gap-2">
+      <form
+        className="bg-white p-3 rounded-2xl max-w-screen-lg 
+      ring ring-transparent transition-shadow has-[:invalid]:ring-red-100 has-[.peer:focus]:bg-cyan-600"
+      >
+        <div
+          className="my-3 flex flex-col gap-2 *:outline-none 
+         "
+        >
           <input
             type="email"
             placeholder="email"
@@ -12,7 +18,7 @@ export default function Home() {
             className="px-5 py-2 bg-slate-200 rounded-full w-full 
             ring ring-transparent focus:ring-green-500 
             focus:ring-offset-2 transition-shadow
-             invalid:focus:ring-red-600 outline-none peer"
+             invalid:focus:ring-red-600 peer"
           />
           <input
             type="password"
@@ -21,7 +27,7 @@ export default function Home() {
             placeholder="password"
             minLength={5}
             required
-            className="px-5 py-2 bg-slate-200 rounded-full w-full outline-none 
+            className="px-5 py-2 bg-slate-200 rounded-full w-full 
             ring ring-transparent ring-offset-2 transition-shadow
              focus:ring-green-500 invalid:focus:ring-red-500
             
