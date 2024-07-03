@@ -4,7 +4,7 @@ export default function Home() {
       <form className="group flex-col max-w-screen-md min-w-40 flex p-5 rounded-2xl bg-white">
         <input type="email" placeholder="Write email" />
         <span className="group-focus-within:block hidden">email focus</span>
-
+        <span className="test text-bigger-hello">test</span>
         <button type="submit" className="bg-tomato rounded-round-144">
           submit
         </button>
