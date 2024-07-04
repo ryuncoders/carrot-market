@@ -4,7 +4,7 @@
 
 @layer base {
   a {
-    @apply text-blue-500;
+    @apply text-main-color;
   }
 }
 
@@ -14,7 +14,9 @@
   }
 }
 
-.test {
-  @apply w-full bg-black h-10 text-white;
-  background-color: teal;
+@layer components {
+  .primary-btn {
+    @apply w-full bg-main-color text-white  rounded-md  
+     text-center hover:bg-orange-400 transition-colors;
+  }
 }

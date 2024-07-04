@@ -8,11 +8,8 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundColor: {
-        tomato: "red",
-      },
-      borderRadius: {
-        "round-144": "144px",
+      colors: {
+        "main-color": "rgb(249, 115, 22)",
       },
     },
   },
