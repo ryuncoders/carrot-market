@@ -1,8 +1,20 @@
+"use client";
+
 import FormBtn from "@/components/form-btn";
 import FormInput from "@/components/form-input";
 import SocialLogin from "@/components/social-login";
 
 export default function LogIn() {
+  const onClick = async () => {
+    const response = await fetch("/api/users", {
+      method: "POST",
+      body: JSON.stringify({
+        username: "ryun",
+        password: "1234,",
+      }),
+    });
+    console.log(await response.json());
+  };
   return (
     <div className="w-full py-8 px-6 *:text-lg *:font-medium flex flex-col gap-10 my-auto">
       <div>
@@ -17,8 +29,11 @@ export default function LogIn() {
           required
           errors={[""]}
         />
-        <FormBtn loading={false} text="로그인" />
       </form>
+      <span onClick={onClick}>
+        <FormBtn loading={false} text="로그인" />
+      </span>
+
       <SocialLogin text="로그인" />
     </div>
   );
