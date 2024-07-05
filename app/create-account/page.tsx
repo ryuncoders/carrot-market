@@ -20,19 +20,28 @@ export default function CreateAccount() {
           type="text"
           placeholder="사용자 이름"
           required
+          errors={state?.fieldErrors.username}
         />
-        <FormInput name="email" type="email" placeholder="이메일" required />
+        <FormInput
+          errors={state?.fieldErrors.email}
+          name="email"
+          type="email"
+          placeholder="이메일"
+          required
+        />
         <FormInput
           name="password"
           type="password"
           placeholder="비밀번호"
           required
+          errors={state?.fieldErrors.password}
         />
         <FormInput
-          name="conform_password"
+          name="confirm_password"
           type="password"
           placeholder="비밀번호 확인"
           required
+          errors={state?.fieldErrors.confirm_password}
         />
         <FormBtn text="회원가입" />
       </form>
