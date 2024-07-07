@@ -1,20 +1,16 @@
 "use server";
 
+import validator from "validator";
 import { z } from "zod";
 
-const smsSchema = z.object({
-  phone: z.number().max(11),
-  token: z.string(),
-});
+const phoneSchema = z.string().trim().refine(validator.isMobilePhone);
 
-export default async function smsVerification(
-  prevState: any,
-  formData: FormData
-) {
+const tokenSchema = z.coerce.number().min(100000).max(999999);
+
+export default async function smsLogin(prevState: any, formData: FormData) {
   const data = {
     phone: formData.get("phone"),
     token: formData.get("token"),
   };
-  const results = smsSchema.safeParse(data);
-  return results;
+  return;
 }
