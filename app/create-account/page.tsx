@@ -8,6 +8,7 @@ import createAccountHandle from "./actions";
 
 export default function CreateAccount() {
   const [state, dispatch] = useFormState(createAccountHandle, null);
+  console.log(state);
   return (
     <div className="w-full py-8 px-6 *:text-lg *:font-medium flex flex-col gap-10 my-auto">
       <div>

@@ -1,6 +1,10 @@
 "use server";
 import { z } from "zod";
 
+const passwordRegex = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*-]).+$/
+);
+
 const formSchema = z
   .object({
     username: z
@@ -10,10 +14,20 @@ const formSchema = z
       })
       .min(3, "3글자 이상 작성")
       .max(10, "10글자 이하 작성")
+      .trim()
+      .toLowerCase()
+      .transform((username) => `✔️{username}`)
       .refine((username) => !username.includes("potato"), "potato 사용 금지"),
     email: z.string().email(),
-    password: z.string().min(10, "10글자 이상"),
-    confirm_password: z.string().min(10, "10글자 이상"),
+    password: z
+      .string()
+      .min(5, "5글자 이상")
+
+      .regex(
+        passwordRegex,
+        "Passwords must contain at least one UPPERCASE, lowercase, number and special characters #?!@$%^&*-"
+      ),
+    confirm_password: z.string(),
   })
   .refine(({ password, confirm_password }) => password === confirm_password, {
     message: "비밀번호가 일치하지 않습니다.",
