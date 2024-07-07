@@ -1,10 +1,10 @@
 "use client";
 import { useFormStatus } from "react-dom";
 
-interface FormBtnProps {
+interface BtnProps {
   text: string;
 }
-export default function FormBtn({ text }: FormBtnProps) {
+export default function Button({ text }: BtnProps) {
   const { pending } = useFormStatus();
   return (
     <button
