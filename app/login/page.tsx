@@ -1,10 +1,11 @@
 "use client";
 
-import FormBtn from "@/components/button";
-import FormInput from "@/components/input";
+import Button from "@/components/button";
+import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
 import { useFormState } from "react-dom";
 import { handleForm } from "./actions";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 
 export default function LogIn() {
   const [state, action] = useFormState(handleForm, null);
@@ -15,14 +16,15 @@ export default function LogIn() {
         <h2>이메일과 비밀번호로 로그인합니다.</h2>
       </div>
       <form action={action} className="flex flex-col gap-3">
-        <FormInput name="email" type="email" placeholder="이메일" required />
-        <FormInput
+        <Input name="email" type="email" placeholder="이메일" required />
+        <Input
           name="password"
           type="password"
           placeholder="비밀번호"
+          minLength={PASSWORD_MIN_LENGTH}
           required
         />
-        <FormBtn text="로그인" />
+        <Button text="로그인" />
       </form>
 
       <SocialLogin text="로그인" />

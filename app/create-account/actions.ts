@@ -1,9 +1,10 @@
 "use server";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+} from "@/lib/constants";
 import { z } from "zod";
-
-const passwordRegex = new RegExp(
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*-]).+$/
-);
 
 const formSchema = z
   .object({
@@ -12,21 +13,15 @@ const formSchema = z
         invalid_type_error: "숫자 x, 글자 작성",
         required_error: "이름 작성",
       })
-      .min(3, "3글자 이상 작성")
-      .max(10, "10글자 이하 작성")
       .trim()
       .toLowerCase()
-      .transform((username) => `✔️{username}`)
+      .transform((username) => `✔️${username}`)
       .refine((username) => !username.includes("potato"), "potato 사용 금지"),
     email: z.string().email(),
     password: z
       .string()
-      .min(5, "5글자 이상")
-
-      .regex(
-        passwordRegex,
-        "Passwords must contain at least one UPPERCASE, lowercase, number and special characters #?!@$%^&*-"
-      ),
+      .min(PASSWORD_MIN_LENGTH, "4글자 이상")
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z.string(),
   })
   .refine(({ password, confirm_password }) => password === confirm_password, {

@@ -1,10 +1,11 @@
 "use client";
 
-import Btn from "@/components/button";
+import Button from "@/components/button";
 import Input from "@/components/input";
 import SocialLogin from "@/components/social-login";
 import { useFormState } from "react-dom";
 import createAccountHandle from "./actions";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 
 export default function CreateAccount() {
   const [state, dispatch] = useFormState(createAccountHandle, null);
@@ -34,7 +35,7 @@ export default function CreateAccount() {
         <Input
           name="password"
           type="password"
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
           placeholder="비밀번호"
           required
           errors={state?.fieldErrors.password}
@@ -43,7 +44,7 @@ export default function CreateAccount() {
           name="confirm_password"
           type="password"
           placeholder="비밀번호 확인"
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
           required
           errors={state?.fieldErrors.confirm_password}
         />
