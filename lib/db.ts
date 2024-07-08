@@ -5,7 +5,7 @@ const db = new PrismaClient();
 async function test() {
   const token = await db.sMSToken.create({
     data: {
-      token: "123123",
+      token: "456456",
       user: {
         connect: {
           id: 1,
