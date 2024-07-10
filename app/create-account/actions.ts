@@ -4,7 +4,30 @@ import {
   PASSWORD_REGEX,
   PASSWORD_REGEX_ERROR,
 } from "@/lib/constants";
+import db from "@/lib/db";
 import { z } from "zod";
+
+const checkUniqueUsername = async (username: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+};
+
+const checkUniqueEmail = async (email: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+    select: {
+      id: true,
+    },
+  });
+};
 
 const formSchema = z
   .object({
@@ -15,13 +38,14 @@ const formSchema = z
       })
       .trim()
       .toLowerCase()
-      .transform((username) => `✔️${username}`)
-      .refine((username) => !username.includes("potato"), "potato 사용 금지"),
-    email: z.string().email(),
-    password: z
+      .refine(checkUniqueUsername, "이미 사용중인 이름입니다."),
+    // .transform((username) => `✔️${username}`)
+    email: z
       .string()
-      .min(PASSWORD_MIN_LENGTH, "4글자 이상")
-      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
+      .email()
+      .refine(checkUniqueEmail, "이미 존재하는 이메일 입니다."),
+    password: z.string().min(PASSWORD_MIN_LENGTH, "4글자 이상"),
+    // .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z.string(),
   })
   .refine(({ password, confirm_password }) => password === confirm_password, {
@@ -39,9 +63,14 @@ export default async function createAccountHandle(
     password: formData.get("password"),
     confirm_password: formData.get("confirm_password"),
   };
-  const result = formSchema.safeParse(data);
+  const result = await formSchema.safeParseAsync(data);
   if (!result.success) {
-    console.log(result.error.flatten());
     return result.error.flatten();
+  } else {
+    // check if the username is already used
+    // check if the email is already used
+    // hash password
+    // log the user in
+    // redirect "/home"
   }
 }
