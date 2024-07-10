@@ -6,6 +6,7 @@ import {
 } from "@/lib/constants";
 import db from "@/lib/db";
 import { z } from "zod";
+import bcrypt from "bcrypt";
 
 const checkUniqueUsername = async (username: string) => {
   const user = await db.user.findUnique({
@@ -16,6 +17,7 @@ const checkUniqueUsername = async (username: string) => {
       id: true,
     },
   });
+  return !Boolean(user);
 };
 
 const checkUniqueEmail = async (email: string) => {
@@ -27,6 +29,7 @@ const checkUniqueEmail = async (email: string) => {
       id: true,
     },
   });
+  return !Boolean(user);
 };
 
 const formSchema = z
@@ -67,9 +70,18 @@ export default async function createAccountHandle(
   if (!result.success) {
     return result.error.flatten();
   } else {
-    // check if the username is already used
-    // check if the email is already used
-    // hash password
+    const hashPassword = await bcrypt.hash(result.data.password, 12);
+    const user = await db.user.create({
+      data: {
+        username: result.data.username,
+        email: result.data.email,
+        password: hashPassword,
+      },
+      // select: {
+      //   id: true,
+      // },
+    });
+    console.log(user);
     // log the user in
     // redirect "/home"
   }
