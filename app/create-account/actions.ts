@@ -7,34 +7,16 @@ import {
 import db from "@/lib/db";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { getIronSession } from "iron-session";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/session";
 
-const checkUniqueUsername = async (username: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      username,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
-
-const checkUniqueEmail = async (email: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
+const checkPassword = ({
+  password,
+  confirm_password,
+}: {
+  password: string;
+  confirm_password: string;
+}) => password === confirm_password;
 
 const formSchema = z
   .object({
@@ -44,18 +26,52 @@ const formSchema = z
         required_error: "이름 작성",
       })
       .trim()
-      .toLowerCase()
-      .refine(checkUniqueUsername, "이미 사용중인 이름입니다."),
+      .toLowerCase(),
     // .transform((username) => `✔️${username}`)
-    email: z
-      .string()
-      .email()
-      .refine(checkUniqueEmail, "이미 존재하는 이메일 입니다."),
+    email: z.string().email().toLowerCase(),
     password: z.string().min(PASSWORD_MIN_LENGTH, "4글자 이상"),
     // .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z.string(),
   })
-  .refine(({ password, confirm_password }) => password === confirm_password, {
+  .superRefine(async ({ username }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: "이미 사용중인 이름입니다.",
+        path: ["username"],
+        fatal: true,
+      });
+      return z.NEVER;
+    }
+  })
+  .superRefine(async ({ email }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: "이미 사용중인 이메일입니다.",
+        path: ["email"],
+        fatal: true,
+      });
+    }
+    return z.NEVER;
+  })
+  .refine(checkPassword, {
     message: "비밀번호가 일치하지 않습니다.",
     path: ["confirm_password"],
   });
