@@ -8,7 +8,7 @@ export default function SocialLogin({ text }: { text: string }) {
 
       <div className="flex gap-2 flex-col">
         <Link
-          href="/github"
+          href="/github/start"
           className=" flex primary-btn p-2 font-normal text-base text-white items-center justify-center gap-2"
         >
           <svg
