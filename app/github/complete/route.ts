@@ -1,6 +1,9 @@
-import { notFound } from "next/navigation";
+import db from "@/lib/db";
+import getSession from "@/lib/session";
+import { notFound, redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
+// 2. GitHub가 사용자를 사이트로 다시 리디렉션합니다.
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   if (!code) {
@@ -18,6 +21,45 @@ export async function GET(request: NextRequest) {
       Accept: "application/json",
     },
   });
-  const accessTokenData = await accessTokenResponse.json();
-  return Response.json({ accessTokenData });
+  const { error, access_token } = await accessTokenResponse.json();
+  if (error) {
+    return new Response(null, { status: 400 });
+  }
+
+  // 3. 앱이 사용자의 액세스 토큰을 사용하여 API에 액세스합니다.
+  const userProfileResponse = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+    cache: "no-cache",
+  });
+  const { id, avatar_url, login } = await userProfileResponse.json();
+  const user = await db.user.findUnique({
+    where: {
+      github_id: id,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (user) {
+    const session = await getSession();
+    session.id = user.id;
+    await session.save();
+    return redirect("/profile");
+  }
+  const newUser = await db.user.create({
+    data: {
+      username: `${login}_gh`,
+      github_id: id,
+      avatar: avatar_url,
+    },
+    select: {
+      id: true,
+    },
+  });
+  const session = await getSession();
+  session.id = newUser.id;
+  await session.save();
+  return redirect("/profile");
 }
