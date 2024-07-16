@@ -50,7 +50,7 @@ export default function CreateAccount() {
         />
         <Button text="회원가입" />
       </form>
-      <SocialLogin text="회원가입" />
+      <SocialLogin />
     </div>
   );
 }

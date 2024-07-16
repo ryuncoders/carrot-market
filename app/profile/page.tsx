@@ -1,5 +1,5 @@
 import db from "@/lib/db";
-import getSession from "@/lib/session";
+import getSession from "@/lib/session/get";
 import { notFound, redirect } from "next/navigation";
 
 async function getUser() {

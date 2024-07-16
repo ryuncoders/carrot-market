@@ -34,7 +34,7 @@ export default function LogIn() {
         <Button text="로그인" />
       </form>
 
-      <SocialLogin text="로그인" />
+      <SocialLogin />
     </div>
   );
 }

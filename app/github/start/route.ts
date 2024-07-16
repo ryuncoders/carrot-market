@@ -1,5 +1,4 @@
 // 1. 사용자는 GitHub ID를 요청하도록 리디렉션됩니다.
-
 export function GET() {
   const baseURL = "https://github.com/login/oauth/authorize";
   const params = {
