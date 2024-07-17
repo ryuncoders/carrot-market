@@ -1,5 +1,6 @@
 "use server";
 import crypto from "crypto";
+import twilio from "twilio";
 import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import validator from "validator";
@@ -93,6 +94,16 @@ export default async function smsLogin(
         },
       });
       // send the token suing twilio
+      console.log(result.data);
+      const client = twilio(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN
+      );
+      await client.messages.create({
+        body: `당근마켓 인증번호: ${token}`,
+        from: process.env.TWILIO_PHONE_NUMBER!,
+        to: process.env.MY_PHONE_NUMBER!,
+      });
       return {
         token: true,
       };
