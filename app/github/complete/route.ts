@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   });
   // user가 있는 경우
   if (user) {
-    await updateSession(user);
+    await updateSession(user.id);
     return redirect("/profile");
   }
 
@@ -63,6 +63,6 @@ export async function GET(request: NextRequest) {
       id: true,
     },
   });
-  await updateSession(newUser);
+  await updateSession(newUser.id);
   return redirect("/profile");
 }

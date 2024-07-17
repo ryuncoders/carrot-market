@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import validator from "validator";
 import { z } from "zod";
+import updateSession from "@/lib/session/update";
 
 export interface ActionState {
   token: boolean;
@@ -16,7 +17,22 @@ const phoneSchema = z
     (phone) => validator.isMobilePhone(phone, "ko-KR"),
     "전화번호를 입력하세요."
   );
-const tokenSchema = z.coerce.number().min(100000).max(999999);
+async function tokenExists(token: number) {
+  const exists = await db.sMSToken.findUnique({
+    where: {
+      token: token.toString(),
+    },
+    select: {
+      id: true,
+    },
+  });
+  return Boolean(exists);
+}
+const tokenSchema = z.coerce
+  .number()
+  .min(100000)
+  .max(999999)
+  .refine(tokenExists, "This token does not exist.");
 
 async function getToken() {
   const token = crypto.randomInt(100000, 999999).toString();
@@ -82,14 +98,33 @@ export default async function smsLogin(
       };
     }
   } else {
-    const result = tokenSchema.safeParse(token);
+    const result = await tokenSchema.spa(token);
     if (!result.success) {
       return {
         token: true,
         error: result.error.flatten(),
       };
     } else {
-      redirect("/");
+      // get the userId of Token
+      const token = await db.sMSToken.findUnique({
+        where: {
+          token: result.data.toString(),
+        },
+        select: {
+          id: true,
+          userId: true,
+        },
+      });
+      // log the user in
+      if (token) {
+        updateSession(token.userId);
+        await db.sMSToken.delete({
+          where: {
+            id: token!.id,
+          },
+        });
+      }
+      redirect("/profile");
     }
   }
 }
