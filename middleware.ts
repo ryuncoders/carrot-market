@@ -10,6 +10,7 @@ const publicOnlyUrls: Routes = {
   "/login": true,
   "/create-account": true,
   "/sms": true,
+  "/update": true,
   "/github/start": true,
   "/github/complete": true,
 };

@@ -9,6 +9,7 @@ import { NextRequest } from "next/server";
 
 // 2. GitHub가 사용자를 사이트로 다시 리디렉션합니다.
 export async function GET(request: NextRequest) {
+  console.log("in complete route");
   const code = request.nextUrl.searchParams.get("code");
   if (!code) {
     return notFound();
@@ -48,7 +49,8 @@ export async function GET(request: NextRequest) {
 
   let newUsername = login;
   if (getUsername) {
-    newUsername = UpdateUsername();
+    // Todo: UpdateUsername(code);
+    newUsername = `${login}-gh`;
   }
   const newUser = await db.user.create({
     data: {
