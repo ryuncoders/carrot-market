@@ -9,6 +9,7 @@ import updateSession from "@/lib/session/update";
 
 export interface ActionState {
   token: boolean;
+  phone?: string;
 }
 
 const phoneSchema = z
@@ -58,7 +59,7 @@ export default async function smsLogin(
 ) {
   const phone = formData.get("phone");
   const token = formData.get("token");
-
+  console.log("prevState", prevState);
   if (!prevState.token) {
     const result = phoneSchema.safeParse(phone);
     if (!result.success) {
@@ -94,7 +95,6 @@ export default async function smsLogin(
         },
       });
       // send the token suing twilio
-      console.log(result.data);
       const client = twilio(
         process.env.TWILIO_ACCOUNT_SID,
         process.env.TWILIO_AUTH_TOKEN
@@ -103,16 +103,18 @@ export default async function smsLogin(
         body: `당근마켓 인증번호: ${token}`,
         from: process.env.TWILIO_PHONE_NUMBER!,
         to: process.env.MY_PHONE_NUMBER!,
+        // to: result.data
       });
       return {
         token: true,
+        phone,
       };
     }
   } else {
     const result = await tokenSchema.spa(token);
     if (!result.success) {
       return {
-        token: true,
+        ...prevState,
         error: result.error.flatten(),
       };
     } else {
@@ -124,9 +126,18 @@ export default async function smsLogin(
         select: {
           id: true,
           userId: true,
+          user: true,
         },
       });
+
       // log the user in
+      if (prevState.phone !== token?.user.phone) {
+        return {
+          ...prevState,
+          error: { formErrors: ["인증번호를 확인하세요."] },
+        };
+      }
+
       if (token) {
         updateSession(token.userId);
         await db.sMSToken.delete({
