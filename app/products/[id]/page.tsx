@@ -1,6 +1,7 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
 import { formatToWon } from "@/lib/utils";
+import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -50,7 +51,7 @@ export default async function productDeail({
         <Image fill src={product.photo} alt={product.title} />
       </div>
       <div className="p-5 flex items-center gap-3 border-b border-neutral-700">
-        <div className="size-10 rounded-full">
+        <div className="size-10 rounded-full overflow-hidden">
           {product.user.avatar !== null ? (
             <Image
               src={product.user.avatar}
@@ -59,7 +60,7 @@ export default async function productDeail({
               alt={product.user.username}
             />
           ) : (
-            <div>userIcon</div>
+            <UserIcon />
           )}
         </div>
         <div>
