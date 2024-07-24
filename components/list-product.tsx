@@ -27,7 +27,7 @@ export default function ListProduct({
         <span className="text-sm text-neutral-500">
           {formatToTimeAgo(created_at + "")}
         </span>
-        <span className="text-lg font-semibold">{formatToWon(price)}</span>
+        <span className="text-lg font-semibold">{formatToWon(price)}원</span>
       </div>
     </Link>
   );
