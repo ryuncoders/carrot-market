@@ -2,7 +2,7 @@
 
 import { InitialProducts } from "@/app/(tabs)/products/page";
 import ListProduct from "./list-product";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getMoreProducts } from "@/app/(tabs)/products/actions";
 
 interface ProductListProps {
@@ -14,31 +14,48 @@ export default function InitialProduct({ initialProducts }: ProductListProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [lastPage, setLastPage] = useState(false);
-  const onLoadMoreClick = async () => {
-    setIsLoading(true);
-    const newProducts = await getMoreProducts(page + 1);
-    if (newProducts.length !== 0) {
-      setPage((prev) => prev + 1);
-      setProducts((prev) => [...prev, ...newProducts]);
-    } else {
-      setLastPage(true);
+
+  const trigger = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async (
+        entries: IntersectionObserverEntry[],
+        observer: IntersectionObserver
+      ) => {
+        const element = entries[0];
+        if (element.isIntersecting && trigger.current) {
+          observer.unobserve(trigger.current);
+          setIsLoading(true);
+          const newProducts = await getMoreProducts(page + 1);
+          if (newProducts.length !== 0) {
+            setPage((prev) => prev + 1);
+            setProducts((prev) => [...prev, ...newProducts]);
+          } else {
+            setLastPage(true);
+          }
+          setIsLoading(false);
+        }
+      },
+      { threshold: 1.0 }
+    );
+    if (trigger.current) {
+      observer.observe(trigger.current);
     }
-    setIsLoading(false);
-  };
+    return () => {
+      observer.disconnect();
+    };
+  }, [page]);
+
   return (
     <div className="grid gap-3">
       {products.map((product) => (
         <ListProduct key={product.id} {...product} />
       ))}
-      {lastPage ? null : (
-        <button
-          onClick={onLoadMoreClick}
-          disabled={isLoading}
-          className="mx-auto w-full border-t-white border-t-1 mt-4"
-        >
+      {!lastPage ? (
+        <span ref={trigger} className="mb-96 text-sm bg-orange-500">
           {isLoading ? "로딩 중" : "더 보기"}
-        </button>
-      )}
+        </span>
+      ) : null}
     </div>
   );
 }
