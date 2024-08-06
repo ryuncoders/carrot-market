@@ -4,13 +4,15 @@ import Button from "@/components/button";
 import Input from "@/components/input";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
-import { uploadProduct } from "./actions";
+import { getUploadURL, uploadProduct } from "./actions";
 import { useFormState } from "react-dom";
 
 export default function AddProduct() {
   const [preview, setPreview] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadURL, setUploadURL] = useState("");
+  const [photoId, setPhotoId] = useState("");
+  const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
     } = event;
@@ -31,8 +33,35 @@ export default function AddProduct() {
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
+
+    const { success, result } = await getUploadURL();
+    if (success) {
+      const { id, uploadURL } = result;
+      setUploadURL(uploadURL);
+      setPhotoId(id);
+    }
   };
-  const [state, action] = useFormState(uploadProduct, null);
+
+  const interceptAction = async (_: any, formData: FormData) => {
+    // upload전 URL로 변경
+    const file = formData.get("photo");
+    if (!file) {
+      return;
+    }
+    const cloudflareForm = new FormData();
+    cloudflareForm.append("file", file);
+    const response = await fetch(uploadURL, {
+      method: "POST",
+      body: cloudflareForm,
+    });
+    if (response.status !== 200) {
+      return;
+    }
+    const photoURL = `https://imagedelivery.net/XnCI-r_Qme1s5loDFzOTkg/${photoId}`;
+    formData.set("photo", photoURL);
+    return uploadProduct(_, formData);
+  };
+  const [state, action] = useFormState(interceptAction, null);
   return (
     <div>
       <form action={action} className="p-5 flex flex-col gap-5">
