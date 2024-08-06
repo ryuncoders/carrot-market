@@ -51,7 +51,7 @@ export default async function productDeail({
         <Image
           fill
           className="object-cover"
-          src={`${product.photo}/public`}
+          src={`${product.photo}/shapen=2`}
           alt={product.title}
         />
       </div>
