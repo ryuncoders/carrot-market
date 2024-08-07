@@ -2,19 +2,10 @@
 
 import db from "@/lib/db";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 import getSession from "@/lib/session/get";
+import { productSchema } from "./schema";
 
-const productSchema = z.object({
-  photo: z.string({ required_error: "사진을 등록해주세요" }),
-  title: z.string({ required_error: "제목을 입력해주세요" }),
-  description: z.string({ required_error: "10자 이상 작성" }),
-  price: z.coerce.number({
-    required_error: "금액을 입력하세요",
-  }),
-});
-
-export async function uploadProduct(_: any, formData: FormData) {
+export async function uploadProduct(formData: FormData) {
   const data = {
     photo: formData.get("photo"),
     title: formData.get("title"),

@@ -5,13 +5,28 @@ import Input from "@/components/input";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { getUploadURL, uploadProduct } from "./actions";
-import { useFormState } from "react-dom";
+
+import { useForm } from "react-hook-form";
+import { productSchema, ProductType } from "./schema";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function AddProduct() {
   const [preview, setPreview] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [uploadURL, setUploadURL] = useState("");
-  const [photoId, setPhotoId] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductType>({ resolver: zodResolver(productSchema) });
+  const onValid = async () => {
+    await onSubmit();
+  };
+
+  // image valid
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -33,21 +48,25 @@ export default function AddProduct() {
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
+    setFile(file);
 
     const { success, result } = await getUploadURL();
     if (success) {
       const { id, uploadURL } = result;
       setUploadURL(uploadURL);
-      setPhotoId(id);
+      setValue(
+        "photo",
+        `https://imagedelivery.net/XnCI-r_Qme1s5loDFzOTkg/${id}`
+      );
     }
   };
 
-  const interceptAction = async (_: any, formData: FormData) => {
-    // upload전 URL로 변경
-    const file = formData.get("photo");
+  // image submit
+  const onSubmit = handleSubmit(async (data: ProductType) => {
     if (!file) {
       return;
     }
+    // upload photo to cloudflare
     const cloudflareForm = new FormData();
     cloudflareForm.append("file", file);
     const response = await fetch(uploadURL, {
@@ -57,14 +76,18 @@ export default function AddProduct() {
     if (response.status !== 200) {
       return;
     }
-    const photoURL = `https://imagedelivery.net/XnCI-r_Qme1s5loDFzOTkg/${photoId}`;
-    formData.set("photo", photoURL);
-    return uploadProduct(_, formData);
-  };
-  const [state, action] = useFormState(interceptAction, null);
+    // send data to zod
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("price", data.price + "");
+    formData.append("description", data.description);
+    formData.append("photo", data.photo);
+    return uploadProduct(formData);
+  });
+
   return (
     <div>
-      <form action={action} className="p-5 flex flex-col gap-5">
+      <form action={onValid} className="p-5 flex flex-col gap-5">
         <label
           htmlFor="photo"
           className="bg-center bg-cover border-2 aspect-square flex justify-center items-center flex-col border-dashed cursor-cursor-pointer rounded-md"
@@ -77,7 +100,7 @@ export default function AddProduct() {
               <PhotoIcon className="w-20" />
               <div className="text-neutral-400 text-sm">
                 사진을 추가해주세요.
-                {state?.fieldErrors.photo}
+                {errors.photo?.message}
               </div>
             </>
           ) : null}
@@ -92,22 +115,22 @@ export default function AddProduct() {
         />
         <span>{errorMessage}</span>
         <Input
-          name="title"
-          errors={state?.fieldErrors.title}
+          {...register("title")}
+          errors={[errors.title?.message ?? ""]}
           required
           placeholder="제목"
           type="text"
         />
         <Input
-          name="price"
-          errors={state?.fieldErrors.price}
+          {...register("price")}
+          errors={[errors.price?.message ?? ""]}
           required
           placeholder="가격"
           type="number"
         />
         <Input
-          errors={state?.fieldErrors.description}
-          name="description"
+          {...register("description")}
+          errors={[errors.description?.message ?? ""]}
           required
           placeholder="자세한 설명"
           type="text"
