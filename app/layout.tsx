@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  // @ts-ignore
+  tomato,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -22,6 +24,7 @@ export default function RootLayout({
       <body
         className={`${inter.className}  text-white h-screen max-w-screen-sm mx-auto`}
       >
+        {tomato}
         {children}
       </body>
     </html>
