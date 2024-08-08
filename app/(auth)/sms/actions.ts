@@ -59,7 +59,6 @@ export default async function smsLogin(
 ) {
   const phone = formData.get("phone");
   const token = formData.get("token");
-  console.log("prevState", prevState);
   if (!prevState.token) {
     const result = phoneSchema.safeParse(phone);
     if (!result.success) {
