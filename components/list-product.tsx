@@ -18,7 +18,7 @@ export default function ListProduct({
   id,
 }: ListProductProps) {
   return (
-    <Link className="flex gap-5" href={`products/${id}`}>
+    <Link className="flex gap-5" href={`/products/${id}`}>
       <div className="relative size-28 rounded-md overflow-hidden">
         <Image
           fill

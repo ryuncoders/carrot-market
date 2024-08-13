@@ -10,7 +10,7 @@ export default function Button({ text }: BtnProps) {
     <button
       type="submit"
       disabled={pending}
-      className="primary-btn text-base p-2 disabled:bg-neutral-500 disabled:cursor-not-allowed"
+      className={`primary-btn text-base p-2 disabled:bg-neutral-500 disabled:cursor-not-allowed w-full`}
     >
       {pending ? "로딩 중..." : text}
     </button>

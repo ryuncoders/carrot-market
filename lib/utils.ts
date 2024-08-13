@@ -10,3 +10,12 @@ export function formatToTimeAgo(date: string): string {
 export function formatToWon(price: number): string {
   return price.toLocaleString("ko-KR");
 }
+
+export function formatToDate(date: Date): string {
+  const format = date.toLocaleString("ko", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return format;
+}
