@@ -51,11 +51,11 @@ export default function InitialProduct({ initialProducts }: ProductListProps) {
       {products.map((product) => (
         <ListProduct key={product.id} {...product} />
       ))}
-      {!lastPage ? (
+      {/* {!lastPage ? (
         <span ref={trigger} className="mb-96 text-sm bg-orange-500">
           {isLoading ? "로딩 중" : "더 보기"}
         </span>
-      ) : null}
+      ) : null} */}
     </div>
   );
 }

@@ -5,6 +5,13 @@ import { formatToDate, formatToWon } from "@/lib/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const product = await getProduct(Number(params.id));
+  return {
+    title: product?.title,
+  };
+}
+
 async function getProduct(id: number) {
   const product = await db.product.findUnique({
     where: {
@@ -27,6 +34,7 @@ async function getProduct(id: number) {
   });
   return product;
 }
+
 export default async function InterceptRoutes({
   params,
 }: {
