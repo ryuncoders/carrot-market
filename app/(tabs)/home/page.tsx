@@ -1,15 +1,17 @@
+import { getProductTitle } from "@/app/products/[id]/page";
 import InitialProduct from "@/components/initial-product";
 import db from "@/lib/db";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { Prisma } from "@prisma/client";
+import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 import Link from "next/link";
-import { unstable_cache as nextCache, revalidatePath } from "next/cache";
 
-// 만료시간에 따라 갱신
 const getCachedProducts = nextCache(getInitialProducts, ["home-products"], {
-  revalidate: 60,
+  tags: ["home-products"],
 });
-
+const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
+  tags: ["product-title"],
+});
 async function getInitialProducts() {
   const products = await db.product.findMany({
     select: {
@@ -19,31 +21,37 @@ async function getInitialProducts() {
       photo: true,
       id: true,
     },
-    take: 1,
     orderBy: {
       created_at: "desc",
     },
   });
   return products;
 }
-
 export type InitialProducts = Prisma.PromiseReturnType<
   typeof getInitialProducts
 >;
+export const metadata = {
+  title: "Home",
+};
 
 export default async function Products() {
   const initialProducts = await getCachedProducts();
-  // 요청형 새로고침 (모든 캐시 새로고침)
+  const getProduct = await getCachedProductTitle(8);
+
   const revalidate = async () => {
     "use server";
-    revalidatePath("/home");
+    console.log("hit!");
+    revalidateTag("home-products");
   };
   return (
     <div className="py-5 px-4">
       <InitialProduct initialProducts={initialProducts} />
       <form action={revalidate}>
-        <button>revalidate</button>
+        <button className="bg-blue-500 px-5 py-2.5 rounded-md text-white font-semibold">
+          Click!
+        </button>
       </form>
+      <span>{getProduct?.title}</span>
       <Link
         href="/products/add"
         className="size-16 bg-main-color text-white flex justify-center items-center rounded-full fixed bottom-24 right-8 transition-colors hover:bg-orange-400"

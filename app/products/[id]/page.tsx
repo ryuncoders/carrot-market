@@ -5,6 +5,7 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -30,6 +31,30 @@ async function getProduct(id: number) {
   });
   return product;
 }
+export async function getProductTitle(id: number) {
+  const productTitle = db.product.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      title: true,
+    },
+  });
+  return productTitle;
+}
+const getCachedProduct = nextCache(getProduct, ["product-detail"], {
+  tags: ["product-detail"],
+});
+const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
+  tags: ["product-title"],
+});
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const product = await getCachedProductTitle(Number(params.id));
+  return {
+    title: product?.title,
+  };
+}
 
 export default async function productDeail({
   params,
@@ -45,6 +70,13 @@ export default async function productDeail({
     return notFound();
   }
   const isOwner = await getIsOwner(product.userId);
+
+  const revalidate = async () => {
+    "use server";
+    console.log("hit!");
+    revalidateTag("product-title");
+  };
+
   return (
     <div>
       <div className="relative aspect-square">
@@ -85,6 +117,7 @@ export default async function productDeail({
             삭제하기
           </button>
         ) : null}
+
         <Link
           className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold"
           href={``}
