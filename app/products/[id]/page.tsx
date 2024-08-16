@@ -5,7 +5,6 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -14,6 +13,16 @@ async function getIsOwner(userId: number) {
   }
   return false;
 }
+
+// 보통 api를 fetch해서 사용함 db에서 데이터를 직접가져오지 않음
+// async function getProduct(id: number) {
+//   fetch("https://api.com", {
+//     next: {
+//       revalidate: 60,
+//       tags: ["hello"],
+//     },
+//   });
+// }
 
 async function getProduct(id: number) {
   const product = await db.product.findUnique({
@@ -42,15 +51,9 @@ export async function getProductTitle(id: number) {
   });
   return productTitle;
 }
-const getCachedProduct = nextCache(getProduct, ["product-detail"], {
-  tags: ["product-detail"],
-});
-const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
-  tags: ["product-title"],
-});
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const product = await getCachedProductTitle(Number(params.id));
+  const product = await getProductTitle(Number(params.id));
   return {
     title: product?.title,
   };
@@ -70,12 +73,6 @@ export default async function productDeail({
     return notFound();
   }
   const isOwner = await getIsOwner(product.userId);
-
-  const revalidate = async () => {
-    "use server";
-    console.log("hit!");
-    revalidateTag("product-title");
-  };
 
   return (
     <div>

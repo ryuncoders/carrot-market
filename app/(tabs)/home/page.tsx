@@ -9,9 +9,6 @@ import Link from "next/link";
 const getCachedProducts = nextCache(getInitialProducts, ["home-products"], {
   tags: ["home-products"],
 });
-const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
-  tags: ["product-title"],
-});
 async function getInitialProducts() {
   const products = await db.product.findMany({
     select: {
@@ -36,11 +33,9 @@ export const metadata = {
 
 export default async function Products() {
   const initialProducts = await getCachedProducts();
-  const getProduct = await getCachedProductTitle(8);
 
   const revalidate = async () => {
     "use server";
-    console.log("hit!");
     revalidateTag("home-products");
   };
   return (
@@ -51,7 +46,7 @@ export default async function Products() {
           Click!
         </button>
       </form>
-      <span>{getProduct?.title}</span>
+
       <Link
         href="/products/add"
         className="size-16 bg-main-color text-white flex justify-center items-center rounded-full fixed bottom-24 right-8 transition-colors hover:bg-orange-400"
