@@ -9,7 +9,6 @@ import updateSession from "@/lib/session/update";
 
 export interface ActionState {
   token: boolean;
-  phone?: string;
 }
 
 const phoneSchema = z
