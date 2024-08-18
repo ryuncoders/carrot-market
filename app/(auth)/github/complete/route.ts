@@ -1,4 +1,3 @@
-import UpdateUsername from "@/app/(auth)/update/username/page";
 import db from "@/lib/db";
 import { getAccessToken } from "@/lib/github/getAccessToken";
 import { getUserEmail } from "@/lib/github/getUserEmail";
