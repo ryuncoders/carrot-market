@@ -40,20 +40,9 @@ async function getProduct(id: number) {
   });
   return product;
 }
-export async function getProductTitle(id: number) {
-  const productTitle = db.product.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      title: true,
-    },
-  });
-  return productTitle;
-}
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-  const product = await getProductTitle(Number(params.id));
+  const product = await getProduct(Number(params.id));
   return {
     title: product?.title,
   };
