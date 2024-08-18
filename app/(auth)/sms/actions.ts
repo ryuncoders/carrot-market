@@ -1,23 +1,21 @@
 "use server";
-import crypto from "crypto";
-import twilio from "twilio";
-import db from "@/lib/db";
-import { redirect } from "next/navigation";
-import validator from "validator";
-import { z } from "zod";
-import updateSession from "@/lib/session/update";
 
-export interface ActionState {
-  token: boolean;
-}
+import twilio from "twilio";
+import crypto from "crypto";
+import { z } from "zod";
+import validator from "validator";
+import { redirect } from "next/navigation";
+import db from "@/lib/db";
+import getSession from "@/lib/session/get";
 
 const phoneSchema = z
   .string()
   .trim()
   .refine(
     (phone) => validator.isMobilePhone(phone, "ko-KR"),
-    "전화번호를 입력하세요."
+    "Wrong phone format"
   );
+
 async function tokenExists(token: number) {
   const exists = await db.sMSToken.findUnique({
     where: {
@@ -29,11 +27,18 @@ async function tokenExists(token: number) {
   });
   return Boolean(exists);
 }
+
 const tokenSchema = z.coerce
   .number()
   .min(100000)
   .max(999999)
   .refine(tokenExists, "This token does not exist.");
+
+interface ActionState {
+  token: boolean;
+}
+
+10 * 10 * 10 * 10 * 10 * 10;
 
 async function getToken() {
   const token = crypto.randomInt(100000, 999999).toString();
@@ -52,10 +57,7 @@ async function getToken() {
   }
 }
 
-export default async function smsLogin(
-  prevState: ActionState,
-  formData: FormData
-) {
+export async function smsLogIn(prevState: ActionState, formData: FormData) {
   const phone = formData.get("phone");
   const token = formData.get("token");
   if (!prevState.token) {
@@ -66,7 +68,6 @@ export default async function smsLogin(
         error: result.error.flatten(),
       };
     } else {
-      // delete previous token
       await db.sMSToken.deleteMany({
         where: {
           user: {
@@ -74,7 +75,6 @@ export default async function smsLogin(
           },
         },
       });
-      // create token
       const token = await getToken();
       await db.sMSToken.create({
         data: {
@@ -92,31 +92,27 @@ export default async function smsLogin(
           },
         },
       });
-      // send the token suing twilio
       const client = twilio(
         process.env.TWILIO_ACCOUNT_SID,
         process.env.TWILIO_AUTH_TOKEN
       );
       await client.messages.create({
-        body: `당근마켓 인증번호: ${token}`,
+        body: `Your Karrot verification code is: ${token}`,
         from: process.env.TWILIO_PHONE_NUMBER!,
         to: process.env.MY_PHONE_NUMBER!,
-        // to: result.data
       });
       return {
         token: true,
-        phone,
       };
     }
   } else {
     const result = await tokenSchema.spa(token);
     if (!result.success) {
       return {
-        ...prevState,
+        token: true,
         error: result.error.flatten(),
       };
     } else {
-      // get the userId of Token
       const token = await db.sMSToken.findUnique({
         where: {
           token: result.data.toString(),
@@ -124,26 +120,16 @@ export default async function smsLogin(
         select: {
           id: true,
           userId: true,
-          user: true,
         },
       });
-
-      // log the user in
-      if (prevState.phone !== token?.user.phone) {
-        return {
-          ...prevState,
-          error: { formErrors: ["인증번호를 확인하세요."] },
-        };
-      }
-
-      if (token) {
-        updateSession(token.userId);
-        await db.sMSToken.delete({
-          where: {
-            id: token!.id,
-          },
-        });
-      }
+      const session = await getSession();
+      session.id = token!.userId;
+      await session.save();
+      await db.sMSToken.delete({
+        where: {
+          id: token!.id,
+        },
+      });
       redirect("/profile");
     }
   }

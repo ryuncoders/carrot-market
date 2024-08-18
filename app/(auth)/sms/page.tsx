@@ -3,7 +3,7 @@
 import Button from "@/components/button";
 import Input from "@/components/input";
 import { useFormState } from "react-dom";
-import smsLogin from "./actions";
+import { smsLogIn } from "./actions";
 
 const initialState = {
   token: false,
@@ -11,7 +11,7 @@ const initialState = {
 };
 
 export default function SMSLogin() {
-  const [state, dispatch] = useFormState(smsLogin, initialState);
+  const [state, dispatch] = useFormState(smsLogIn, initialState);
   return (
     <div className="w-full py-8 px-6 *:text-lg *:font-medium flex flex-col gap-10 my-auto">
       <div>
