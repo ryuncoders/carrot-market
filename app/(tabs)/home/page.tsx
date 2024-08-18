@@ -1,4 +1,3 @@
-import { getProductTitle } from "@/app/products/[id]/page";
 import InitialProduct from "@/components/initial-product";
 import db from "@/lib/db";
 import { PlusIcon } from "@heroicons/react/24/solid";
