@@ -85,7 +85,10 @@ export default async function InterceptRoutes({
                   <div className="font-semibold text-lg">
                     {formatToWon(product.price)}원
                   </div>
-                  <div className="w-40 sm:w-20">
+                  <div className="flex gap-2 ">
+                    <button className="primary-btn text-base p-2 disabled:bg-neutral-500 bg-red-600 disabled:cursor-not-allowed w-full">
+                      삭제
+                    </button>
                     <Button text="구매" />
                   </div>
                 </div>
