@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/session/get";
 import { productSchema } from "./schema";
+import { revalidatePath } from "next/cache";
 
 export async function uploadProduct(formData: FormData) {
   const data = {
@@ -34,6 +35,7 @@ export async function uploadProduct(formData: FormData) {
         id: true,
       },
     });
+    revalidatePath("/home");
     redirect(`/products/${product.id}`);
   }
 }
