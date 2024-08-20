@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { formatToDate, formatToWon } from "@/lib/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import Link from "next/link";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await getProduct(Number(params.id));
@@ -86,9 +87,12 @@ export default async function InterceptRoutes({
                     {formatToWon(product.price)}원
                   </div>
                   <div className="flex gap-2 ">
-                    <button className="primary-btn text-base p-2 disabled:bg-neutral-500 bg-red-600 disabled:cursor-not-allowed w-full">
-                      삭제
-                    </button>
+                    <Link
+                      href={`/products/${params.id}/edit`}
+                      className="primary-btn text-base p-2 disabled:bg-neutral-500 bg-red-600 disabled:cursor-not-allowed w-full"
+                    >
+                      편집
+                    </Link>
                     <Button text="구매" />
                   </div>
                 </div>

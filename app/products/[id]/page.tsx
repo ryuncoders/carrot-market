@@ -5,16 +5,17 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { onDelete } from "./actions";
 
-async function getIsOwner(userId: number) {
-  // const session = await getSession();
-  // if (session.id) {
-  //   return (session.id = userId);
-  // }
+export async function getIsOwner(userId: number) {
+  const session = await getSession();
+  if (session.id) {
+    return (session.id = userId);
+  }
   return false;
 }
 
-// 보통 api를 fetch해서 사용함 db에서 데이터를 직접가져오지 않음
+// 보통 api를 fetch해서 사용함 db에서 데이터를 직접가져오지 않/음
 // async function getProduct(id: number) {
 //   fetch("https://api.com", {
 //     next: {
@@ -24,7 +25,7 @@ async function getIsOwner(userId: number) {
 //   });
 // }
 
-async function getProduct(id: number) {
+export async function getProduct(id: number) {
   const product = await db.product.findUnique({
     where: {
       id,
@@ -61,8 +62,10 @@ export default async function productDeail({
   if (!product) {
     return notFound();
   }
-  const isOwner = await getIsOwner(product.userId);
-
+  const isOwner = Boolean(await getIsOwner(product.userId));
+  const onClick = () => {
+    console.log("삭제하기");
+  };
   return (
     <div>
       <div className="relative aspect-square">
@@ -99,9 +102,15 @@ export default async function productDeail({
           {formatToWon(product.price)}원
         </span>
         {isOwner ? (
-          <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold">
-            삭제하기
-          </button>
+          <>
+            <button onClick={onClick}>삭제하기</button>
+            <Link
+              href={`/products/${params.id}/edit`}
+              className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
+            >
+              수정하기
+            </Link>
+          </>
         ) : null}
 
         <Link
