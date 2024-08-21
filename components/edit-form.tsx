@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { productSchema, ProductType } from "@/app/products/add/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotFound from "@/app/not-found";
+import Image from "next/image";
 
 interface ProductProps {
   id: string;
@@ -99,22 +100,20 @@ export default function EditForm({
   return (
     <>
       {isOwner ? (
-        <div className="p-5 flex flex-col gap-5">
-          <form action={onValid}>
+        <div className="p-5">
+          <form action={onValid} className="flex flex-col gap-5">
             <label
               htmlFor="photo"
-              className="bg-center bg-cover border-2 aspect-square flex justify-center items-center flex-col border-dashed cursor-cursor-pointer rounded-md"
-              style={{
-                backgroundImage: `url(${preview})`,
-              }}
+              style={{ backgroundImage: `url(${preview})` }}
+              className="relative bg-center bg-cover border-2 aspect-square flex justify-center items-center flex-col border-dashed cursor-cursor-pointer rounded-md"
             >
-              {preview === "" ? (
-                <>
-                  <PhotoIcon className="w-20" />
-                  <div className="text-neutral-400 text-sm">
-                    사진을 추가해주세요.
-                  </div>
-                </>
+              {photo === preview ? (
+                <Image
+                  src={`${photo}/shapen=2`}
+                  fill
+                  alt={title}
+                  className="object-cover"
+                />
               ) : null}
             </label>
             <input

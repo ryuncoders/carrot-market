@@ -5,7 +5,7 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { onDelete } from "./actions";
+import DeleteBtn from "@/components/delete-button";
 
 export async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -63,9 +63,7 @@ export default async function productDeail({
     return notFound();
   }
   const isOwner = Boolean(await getIsOwner(product.userId));
-  const onClick = () => {
-    console.log("삭제하기");
-  };
+
   return (
     <div>
       <div className="relative aspect-square">
@@ -103,7 +101,7 @@ export default async function productDeail({
         </span>
         {isOwner ? (
           <>
-            <button onClick={onClick}>삭제하기</button>
+            <DeleteBtn id={params.id} isOwner={isOwner} />
             <Link
               href={`/products/${params.id}/edit`}
               className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
