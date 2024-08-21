@@ -62,9 +62,9 @@ model Post {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  userId  Int
-  Comment Comment[]
-  Like    Like[]
+  userId   Int
+  comments Comment[]
+  likes    Like[]
 }
 
 model Comment {
