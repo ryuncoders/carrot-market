@@ -1,4 +1,6 @@
+import { getIsOwner } from "@/app/products/[id]/page";
 import Button from "@/components/button";
+import DeleteBtn from "@/components/delete-button";
 import BackPreview from "@/components/preview-back";
 import db from "@/lib/db";
 import { formatToDate, formatToWon } from "@/lib/utils";
@@ -28,6 +30,7 @@ async function getProduct(id: number) {
       user: {
         select: {
           username: true,
+          id: true,
           avatar: true,
         },
       },
@@ -42,7 +45,7 @@ export default async function InterceptRoutes({
   params: { id: string };
 }) {
   const product = await getProduct(+params.id);
-
+  const isOwner = Boolean(getIsOwner(+product?.user.id!));
   return (
     <>
       {product ? (
@@ -87,6 +90,7 @@ export default async function InterceptRoutes({
                     {formatToWon(product.price)}원
                   </div>
                   <div className="flex gap-2 ">
+                    <DeleteBtn id={params.id} isOwner={isOwner} />
                     <Link
                       href={`/products/${params.id}/edit`}
                       className="primary-btn text-base p-2 disabled:bg-neutral-500 bg-red-600 disabled:cursor-not-allowed w-full"

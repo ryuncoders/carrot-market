@@ -44,11 +44,10 @@ export default async function Products() {
     <div className="py-5 px-4">
       <InitialProduct initialProducts={initialProducts} />
       <form action={revalidate}>
-        <button className="bg-blue-500 px-5 py-2.5 rounded-md text-white font-semibold">
-          Click!
+        <button className="bg-blue-500 px-5 py-2.5 rounded-md text-white font-semibold mt-5">
+          revalidate
         </button>
       </form>
-
       <Link
         href="/products/add"
         className="size-16 bg-main-color text-white flex justify-center items-center rounded-full fixed bottom-24 right-8 transition-colors hover:bg-orange-400"
