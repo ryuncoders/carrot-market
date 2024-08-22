@@ -1,12 +1,12 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
 import { formatToTimeAgo } from "@/lib/utils";
-import { HandThumbUpIcon as HandThumbUpIconOutLine } from "@heroicons/react/24/outline";
-import { HandThumbUpIcon as HandThumUpIconSolid } from "@heroicons/react/24/solid";
+
 import { EyeIcon } from "@heroicons/react/24/solid";
-import { unstable_cache as nextCache, revalidateTag } from "next/cache";
+import { unstable_cache as nextCache } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import LikeButton from "@/components/like-button";
 
 async function getPost(id: number) {
   try {
@@ -92,40 +92,6 @@ export default async function PostDetail({
     return notFound();
   }
 
-  const likePost = async () => {
-    "use server";
-    const session = await getSession();
-    try {
-      await db.like.create({
-        data: {
-          postId: id,
-          userId: session.id!,
-        },
-      });
-      revalidateTag(`like-status-${id}`);
-    } catch (e) {
-      return {};
-    }
-  };
-
-  const dislikePost = async () => {
-    "use server";
-    const session = await getSession();
-    try {
-      await db.like.delete({
-        where: {
-          id: {
-            userId: session.id!,
-            postId: id,
-          },
-        },
-      });
-      revalidateTag(`like-status-${id}`);
-    } catch (e) {
-      return {};
-    }
-  };
-
   const { isLiked, likeCount } = await getCachedLikeStatus(id);
   return (
     <div className="flex flex-col gap-5 py-5 px-4">
@@ -147,19 +113,7 @@ export default async function PostDetail({
           <EyeIcon className="size-5 mr-2" />
           조회 {post.views}
         </div>
-        <form
-          className="cursor-pointer "
-          action={isLiked ? dislikePost : likePost}
-        >
-          <button className="flex items-center text-sm border border-neutral-400 rounded-full p-2 hover:bg-neutral-700 transition-colors">
-            {isLiked ? (
-              <HandThumUpIconSolid className="size-5 mr-2" />
-            ) : (
-              <HandThumbUpIconOutLine className="size-5 mr-2" />
-            )}
-            <span>{likeCount}</span>
-          </button>
-        </form>
+        <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
       </div>
     </div>
   );
