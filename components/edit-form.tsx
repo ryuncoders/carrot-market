@@ -4,7 +4,6 @@ import editHandle from "@/app/products/[id]/edit/action";
 import Input from "./input";
 import Button from "./button";
 import React, { useState } from "react";
-import { PhotoIcon } from "@heroicons/react/24/solid";
 import { getUploadURL } from "@/app/products/add/actions";
 import { useForm } from "react-hook-form";
 import { productSchema, ProductType } from "@/app/products/add/schema";

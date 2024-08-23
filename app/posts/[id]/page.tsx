@@ -1,12 +1,12 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
 import { formatToTimeAgo } from "@/lib/utils";
-
 import { EyeIcon } from "@heroicons/react/24/solid";
 import { unstable_cache as nextCache } from "next/cache";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import LikeButton from "@/components/like-button";
+import Comment from "@/components/comment";
 
 async function getPost(id: number) {
   try {
@@ -78,6 +78,49 @@ async function getCachedLikeStatus(postId: number) {
   return cachedOperation(postId, userId);
 }
 
+async function getComments(postId: number, userId: number) {
+  const comments = db.comment.findMany({
+    where: {
+      userId,
+      postId,
+    },
+    select: {
+      payload: true,
+      postId: true,
+      user: {
+        select: {
+          created_at: true,
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+  return comments;
+}
+
+async function getCacheComments(postId: number) {
+  const session = await getSession();
+  const userId = session.id!;
+  const getCacheComments = nextCache(getComments, ["post-comments"], {
+    tags: [`post-comments-${postId}`],
+  });
+  return getCacheComments(postId, userId);
+}
+
+async function getUser() {
+  const session = await getSession();
+  const user = await db.user.findUnique({
+    where: {
+      id: session.id,
+    },
+    select: {
+      username: true,
+    },
+  });
+  return user;
+}
+
 export default async function PostDetail({
   params,
 }: {
@@ -92,30 +135,39 @@ export default async function PostDetail({
     return notFound();
   }
 
+  const comments = await getCacheComments(id);
   const { isLiked, likeCount } = await getCachedLikeStatus(id);
+  const user = await getUser();
   return (
-    <div className="flex flex-col gap-5 py-5 px-4">
-      <div className="flex items-center">
-        <div className="size-7 rounded-full relative overflow-hidden mr-2">
-          <Image fill src={post.user.avatar!} alt={post.user.username} />
+    <>
+      <div className="flex flex-col gap-5 py-5 px-4">
+        <div className="flex items-center">
+          <div className="size-7 rounded-full relative overflow-hidden mr-2">
+            <Image fill src={post.user.avatar!} alt={post.user.username} />
+          </div>
+          <span>{post.user.username}</span>
+          <span className="ml-auto text-sm">
+            {formatToTimeAgo(post.created_at + "")}
+          </span>
         </div>
-        <span>{post.user.username}</span>
-        <span className="ml-auto text-sm">
-          {formatToTimeAgo(post.created_at + "")}
-        </span>
-      </div>
-      <div className="flex flex-col mb-5 min-h-40 p-2 gap-1">
-        <h2 className="font-semibold text-xl">{post.title}</h2>
-        <p className="text-base">{post.description}</p>
-      </div>
-      <div className="flex justify-between items-center ">
-        <div className="flex items-center text-sm">
-          <EyeIcon className="size-5 mr-2" />
-          조회 {post.views}
+        <div className="flex flex-col mb-5 min-h-40 p-2 gap-1">
+          <h2 className="font-semibold text-xl">{post.title}</h2>
+          <p className="text-base">{post.description}</p>
         </div>
-        <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
+        <div className="flex justify-between items-center ">
+          <div className="flex items-center text-sm">
+            <EyeIcon className="size-5 mr-2" />
+            조회 {post.views}
+          </div>
+          <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
+        </div>
       </div>
-    </div>
+      <div className="px-5 flex flex-col gap-10">
+        <hr />
+        <span>댓글</span>
+        <Comment comments={comments} user={user!} postId={id} />
+      </div>
+    </>
   );
 }
 
