@@ -87,9 +87,9 @@ async function getComments(postId: number, userId: number) {
     select: {
       payload: true,
       postId: true,
+      created_at: true,
       user: {
         select: {
-          created_at: true,
           username: true,
           avatar: true,
         },
@@ -116,6 +116,7 @@ async function getUser() {
     },
     select: {
       username: true,
+      avatar: true,
     },
   });
   return user;
@@ -157,16 +158,12 @@ export default async function PostDetail({
         <div className="flex justify-between items-center ">
           <div className="flex items-center text-sm">
             <EyeIcon className="size-5 mr-2" />
-            조회 {post.views}
+            {post.views}명이 봤어요
           </div>
           <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
         </div>
       </div>
-      <div className="px-5 flex flex-col gap-10">
-        <hr />
-        <span>댓글</span>
-        <Comment comments={comments} user={user!} postId={id} />
-      </div>
+      <Comment comments={comments} user={user!} postId={id} />
     </>
   );
 }
