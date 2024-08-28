@@ -1,4 +1,4 @@
-import { getIsOwner } from "@/app/products/[id]/page";
+import { getIsOwner } from "@/app/products/[id]/actions";
 import Button from "@/components/button";
 import DeleteBtn from "@/components/delete-button";
 import BackPreview from "@/components/preview-back";

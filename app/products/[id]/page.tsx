@@ -1,19 +1,11 @@
 import db from "@/lib/db";
-import getSession from "@/lib/session/get";
 import { formatToWon } from "@/lib/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DeleteBtn from "@/components/delete-button";
-
-export async function getIsOwner(userId: number) {
-  const session = await getSession();
-  if (session.id) {
-    return (session.id = userId);
-  }
-  return false;
-}
+import { getIsOwner, getProduct } from "./actions";
 
 // 보통 api를 fetch해서 사용함 db에서 데이터를 직접가져오지 않/음
 // async function getProduct(id: number) {
@@ -24,23 +16,6 @@ export async function getIsOwner(userId: number) {
 //     },
 //   });
 // }
-
-export async function getProduct(id: number) {
-  const product = await db.product.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      user: {
-        select: {
-          username: true,
-          avatar: true,
-        },
-      },
-    },
-  });
-  return product;
-}
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await getProduct(Number(params.id));

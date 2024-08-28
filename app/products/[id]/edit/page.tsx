@@ -1,7 +1,8 @@
 import EditForm from "@/components/edit-form";
-import { getIsOwner, getProduct } from "../page";
+
 import NotFound from "@/app/not-found";
 import { unstable_cache as nextCache } from "next/cache";
+import { getIsOwner, getProduct } from "../actions";
 
 const getCahcedProduct = nextCache(getProduct, ["product-detail"], {
   tags: ["product-details"],

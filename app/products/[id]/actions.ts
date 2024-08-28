@@ -1,6 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
+import getSession from "@/lib/session/get";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -31,3 +32,28 @@ export const onDelete = async (id: number, isOwner: boolean) => {
   revalidateTag("product-detail");
   redirect("/home");
 };
+
+export async function getProduct(id: number) {
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+  return product;
+}
+
+export async function getIsOwner(userId: number) {
+  const session = await getSession();
+  if (session.id) {
+    return (session.id = userId);
+  }
+  return false;
+}
