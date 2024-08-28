@@ -96,6 +96,7 @@ export default async function createAccountHandle(
         username: result.data.username,
         email: result.data.email,
         password: hashPassword,
+        avatar: "/user.png",
       },
       select: {
         id: true,

@@ -81,7 +81,6 @@ async function getCachedLikeStatus(postId: number) {
 async function getComments(postId: number, userId: number) {
   const comments = db.comment.findMany({
     where: {
-      userId,
       postId,
     },
     select: {
@@ -94,6 +93,9 @@ async function getComments(postId: number, userId: number) {
           avatar: true,
         },
       },
+    },
+    orderBy: {
+      created_at: "desc",
     },
   });
   return comments;
@@ -139,6 +141,7 @@ export default async function PostDetail({
   const comments = await getCacheComments(id);
   const { isLiked, likeCount } = await getCachedLikeStatus(id);
   const user = await getUser();
+
   return (
     <>
       <div className="flex flex-col gap-5 py-5 px-4">

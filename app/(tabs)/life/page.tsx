@@ -4,6 +4,7 @@ import {
   ChatBubbleBottomCenterIcon,
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 
 async function getPosts() {
@@ -60,6 +61,12 @@ export default async function Life() {
           </div>
         </Link>
       ))}
+      <Link
+        href="/posts/add"
+        className="size-16 bg-main-color text-white flex justify-center items-center rounded-full fixed bottom-24 right-8 transition-colors hover:bg-orange-400"
+      >
+        <PlusIcon className="size-10" />
+      </Link>
     </div>
   );
 }

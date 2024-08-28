@@ -45,7 +45,7 @@ export default function Comment({ comments, user, postId }: CommentProps) {
       created_at: new Date(),
       user: {
         username: user.username || "You",
-        avatar: user.avatar,
+        avatar: user.avatar || "/user.png",
       },
     };
     setOptimisticComments(newComment);
