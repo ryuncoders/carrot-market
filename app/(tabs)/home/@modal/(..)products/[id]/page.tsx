@@ -1,12 +1,11 @@
-import { getIsOwner } from "@/app/products/[id]/actions";
-import Button from "@/components/button";
+import { createChatRoom, getIsOwner } from "@/app/products/[id]/actions";
 import DeleteBtn from "@/components/delete-button";
 import BackPreview from "@/components/preview-back";
-import db from "@/lib/db";
 import { formatToDate, formatToWon } from "@/lib/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
+import { getProduct } from "./action";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await getProduct(Number(params.id));
@@ -15,37 +14,17 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   };
 }
 
-async function getProduct(id: number) {
-  const product = await db.product.findUnique({
-    where: {
-      id,
-    },
-
-    select: {
-      title: true,
-      created_at: true,
-      description: true,
-      photo: true,
-      price: true,
-      user: {
-        select: {
-          username: true,
-          id: true,
-          avatar: true,
-        },
-      },
-    },
-  });
-  return product;
-}
-
 export default async function InterceptRoutes({
   params,
 }: {
   params: { id: string };
 }) {
   const product = await getProduct(+params.id);
-  const isOwner = Boolean(getIsOwner(+product?.user.id!));
+  const isOwner = await getIsOwner(+product?.user.id!);
+  const onClickChatHandle = async () => {
+    "use server";
+    await createChatRoom(+params.id, product!.userId);
+  };
   return (
     <>
       {product ? (
@@ -61,7 +40,7 @@ export default async function InterceptRoutes({
             </div>
             <div className="flex flex-col gap-3 w-full sm:w-1/2 p-3 bg-neutral-800 ">
               <div className="flex gap-2 items-center">
-                <div>
+                <div className="size-6 relative overflow-hidden rounded-full">
                   {product.user.avatar ? (
                     <Image
                       fill
@@ -69,7 +48,7 @@ export default async function InterceptRoutes({
                       src={product.user.avatar}
                     />
                   ) : (
-                    <UserIcon height={30} width={30} />
+                    <UserIcon />
                   )}
                 </div>
                 <div>{product.user.username}</div>
@@ -90,14 +69,23 @@ export default async function InterceptRoutes({
                     {formatToWon(product.price)}원
                   </div>
                   <div className="flex gap-2 ">
-                    <DeleteBtn id={params.id} isOwner={isOwner} />
-                    <Link
-                      href={`/products/${params.id}/edit`}
-                      className="primary-btn text-base p-2 disabled:bg-neutral-500 bg-red-600 disabled:cursor-not-allowed w-full"
-                    >
-                      편집
-                    </Link>
-                    <Button text="구매" />
+                    {isOwner ? (
+                      <>
+                        <DeleteBtn id={params.id} />
+                        <Link
+                          href={`/products/${params.id}/edit`}
+                          className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
+                        >
+                          수정
+                        </Link>
+                      </>
+                    ) : (
+                      <form action={onClickChatHandle}>
+                        <button className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold">
+                          채팅
+                        </button>
+                      </form>
+                    )}
                   </div>
                 </div>
               </div>

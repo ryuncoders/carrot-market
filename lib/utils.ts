@@ -19,3 +19,12 @@ export function formatToDate(date: Date): string {
   });
   return format;
 }
+
+export function formatToTime(date: Date): string {
+  const format = date.toLocaleString("ko-KR", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+  return format;
+}

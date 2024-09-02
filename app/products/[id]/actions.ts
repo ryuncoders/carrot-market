@@ -5,8 +5,57 @@ import getSession from "@/lib/session/get";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
-export const onDelete = async (id: number, isOwner: boolean) => {
-  if (!isOwner) return;
+export async function createChatRoom(productId: number, productUserId: number) {
+  const session = await getSession();
+
+  // 사용자 id, product id가 존재하면
+  const findRoom = await db.product.findUnique({
+    where: {
+      id: productId,
+      chatRoom: {
+        some: {
+          users: {
+            some: {
+              id: session.id,
+            },
+          },
+        },
+      },
+    },
+    select: {
+      chatRoom: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+  if (findRoom) {
+    redirect(`/chats/${findRoom.chatRoom[0].id}`);
+  }
+
+  const room = await db.chatRoom.create({
+    data: {
+      users: {
+        connect: [
+          {
+            id: productUserId,
+          },
+          {
+            id: session.id,
+          },
+        ],
+      },
+      productId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  redirect(`/chats/${room.id}`);
+}
+
+export const onDelete = async (id: number) => {
   const product = await db.product.delete({
     where: {
       id,
@@ -53,7 +102,7 @@ export async function getProduct(id: number) {
 export async function getIsOwner(userId: number) {
   const session = await getSession();
   if (session.id) {
-    return (session.id = userId);
+    return session.id === userId;
   }
   return false;
 }

@@ -19,7 +19,6 @@ export default function Layout() {
           <div className="mt-auto flex gap-2 items-center justify-between h-10">
             <div className=" bg-neutral-900 size-8 rounded-full " />
             <div className="w-30 h-3 bg-neutral-900 rounded-md mr-4" />
-            <Button text="구매" />
           </div>
         </div>
       </div>

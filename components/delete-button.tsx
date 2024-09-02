@@ -5,14 +5,13 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface DeleteBtnProps {
   id: string;
-  isOwner: boolean;
 }
 
-export default function DeleteBtn({ id, isOwner }: DeleteBtnProps) {
+export default function DeleteBtn({ id }: DeleteBtnProps) {
   const onClick = () => {
     const result = confirm("삭제하시겠습니까?");
     if (result) {
-      onDelete(+id, isOwner);
+      onDelete(+id);
     } else {
       return;
     }

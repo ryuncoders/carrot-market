@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DeleteBtn from "@/components/delete-button";
-import { getIsOwner, getProduct } from "./actions";
+import { createChatRoom, getIsOwner, getProduct } from "./actions";
 
 // 보통 api를 fetch해서 사용함 db에서 데이터를 직접가져오지 않/음
 // async function getProduct(id: number) {
@@ -38,7 +38,10 @@ export default async function productDeail({
     return notFound();
   }
   const isOwner = Boolean(await getIsOwner(product.userId));
-
+  const onClickChatHandle = async () => {
+    "use server";
+    await createChatRoom(id, product.userId);
+  };
   return (
     <div>
       <div className="relative aspect-square">
@@ -76,7 +79,7 @@ export default async function productDeail({
         </span>
         {isOwner ? (
           <>
-            <DeleteBtn id={params.id} isOwner={isOwner} />
+            <DeleteBtn id={params.id} />
             <Link
               href={`/products/${params.id}/edit`}
               className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
@@ -84,14 +87,13 @@ export default async function productDeail({
               수정하기
             </Link>
           </>
-        ) : null}
-
-        <Link
-          className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold"
-          href={``}
-        >
-          채팅하기
-        </Link>
+        ) : (
+          <form action={onClickChatHandle}>
+            <button className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold">
+              채팅하기
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
