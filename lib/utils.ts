@@ -20,8 +20,9 @@ export function formatToDate(date: Date): string {
   return format;
 }
 
-export function formatToTime(date: Date): string {
-  const format = date.toLocaleString("ko-KR", {
+export function formatToTime(date: string): string {
+  const newDate = new Date(date);
+  const format = newDate.toLocaleString("ko-KR", {
     hour: "numeric",
     minute: "numeric",
     hour12: true,

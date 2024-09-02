@@ -1,7 +1,7 @@
 "use client";
 
 import { InitialChatMessages } from "@/app/chats/[id]/page";
-import { formatToTime } from "@/lib/utils";
+import { formatToDate, formatToTime, formatToTimeAgo } from "@/lib/utils";
 import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
 import { createClient, RealtimeChannel } from "@supabase/supabase-js";
 import Image from "next/image";
@@ -11,6 +11,8 @@ interface chatMessageListProps {
   initialMessages: InitialChatMessages;
   userId: number;
   chatRoomId: string;
+  username: string;
+  avatar: string;
 }
 
 const SUPABASE_URL = "https://zudjduiyvgrhmcggfsqv.supabase.co";
@@ -21,6 +23,8 @@ export default function ChatMessagesList({
   chatRoomId,
   initialMessages,
   userId,
+  username,
+  avatar,
 }: chatMessageListProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
@@ -43,15 +47,24 @@ export default function ChatMessagesList({
         created_at: new Date(),
         userId,
         user: {
-          username: "user",
-          avatar: "xxx",
+          username,
+          avatar,
         },
       },
     ]);
     channel.current?.send({
       type: "broadcast",
       event: "message",
-      payload: { message },
+      payload: {
+        id: Date.now(),
+        payload: message,
+        created_at: new Date(),
+        userId,
+        user: {
+          username,
+          avatar,
+        },
+      },
     });
     setMessage("");
   };
@@ -61,7 +74,7 @@ export default function ChatMessagesList({
     channel.current = client.channel(`room-${chatRoomId}`);
     channel.current
       .on("broadcast", { event: "message" }, (payload) => {
-        console.log(payload);
+        setMessages((prevMsgs) => [...prevMsgs, payload.payload]);
       })
       .subscribe();
     return () => {
@@ -69,6 +82,10 @@ export default function ChatMessagesList({
     };
   }, [chatRoomId]);
 
+  useEffect(() => {
+    console.log("message", message);
+    console.log("message-list", messages);
+  }, [messages, message]);
   return (
     <div className="p-5 flex flex-col gap-3 min-h-screen justify-end">
       {messages.map((message) => (
@@ -88,7 +105,7 @@ export default function ChatMessagesList({
             />
           )}
           <div
-            className={`flex gap-3 items-end ${
+            className={`flex gap-2 items-end ${
               message.userId === userId ? "items-end" : ""
             }`}
           >
@@ -102,7 +119,7 @@ export default function ChatMessagesList({
               {message.payload}
             </span>
             <span className="text-xs text-neutral-400">
-              {formatToTime(message.created_at)}
+              {formatToTime(message.created_at.toString())}
             </span>
           </div>
         </div>
