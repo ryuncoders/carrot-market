@@ -1,5 +1,3 @@
-"use server";
-
 import ChatMessagesList from "@/components/chat-messages-list";
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
@@ -51,11 +49,14 @@ async function getMessages(chatRoomId: string) {
   return messages;
 }
 
-async function getUserProfile() {
-  const session = await getSession();
+const getCachedMessages = nextCache(getMessages, ["chat-messages"], {
+  tags: ["messages"],
+});
+
+async function getUserProfile(sessionId: number) {
   const user = await db.user.findUnique({
     where: {
-      id: session.id!,
+      id: sessionId,
     },
     select: {
       username: true,
@@ -65,22 +66,23 @@ async function getUserProfile() {
   return user;
 }
 
-// const getCachedUserProfile = nextCache(getUserProfile, ["userProfile"], {
-//   tags: ["userProfile"],
-// });
+const getCachedUserProfile = nextCache(getUserProfile, ["userProfile"], {
+  tags: ["userProfile"],
+});
+
 export type InitialChatMessages = Prisma.PromiseReturnType<typeof getMessages>;
 
 export default async function Chat({ params }: { params: { id: string } }) {
+  const session = await getSession();
   const room = await getRoom(params.id);
   if (!room) {
     return notFound();
   }
-  const user = await getUserProfile();
+  const user = await getCachedUserProfile(session.id!);
   if (!user) {
     return notFound();
   }
-  const initialMessages = await getMessages(params.id);
-  const session = await getSession();
+  const initialMessages = await getCachedMessages(params.id);
   return (
     <div>
       <ChatMessagesList

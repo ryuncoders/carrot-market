@@ -1,5 +1,6 @@
 "use client";
 
+import { createMessage } from "@/app/chats/[id]/actions";
 import { InitialChatMessages } from "@/app/chats/[id]/page";
 import { formatToDate, formatToTime, formatToTimeAgo } from "@/lib/utils";
 import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
@@ -37,7 +38,7 @@ export default function ChatMessagesList({
     setMessage(value);
   };
 
-  const onSubmit = (event: React.FormEvent) => {
+  const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setMessages((prevMsgs) => [
       ...prevMsgs,
@@ -66,6 +67,7 @@ export default function ChatMessagesList({
         },
       },
     });
+    await createMessage(message, chatRoomId);
     setMessage("");
   };
 
@@ -82,10 +84,6 @@ export default function ChatMessagesList({
     };
   }, [chatRoomId]);
 
-  useEffect(() => {
-    console.log("message", message);
-    console.log("message-list", messages);
-  }, [messages, message]);
   return (
     <div className="p-5 flex flex-col gap-3 min-h-screen justify-end">
       {messages.map((message) => (
