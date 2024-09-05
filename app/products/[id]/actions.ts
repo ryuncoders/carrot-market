@@ -79,7 +79,7 @@ export const onDelete = async (id: number) => {
   );
   revalidatePath("/home");
   revalidateTag("product-detail");
-  redirect("/home");
+  return redirect("/home");
 };
 
 export async function getProduct(id: number) {

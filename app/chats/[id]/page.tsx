@@ -4,6 +4,14 @@ import getSession from "@/lib/session/get";
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { unstable_cache as nextCache } from "next/cache";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  EllipsisVerticalIcon,
+} from "@heroicons/react/24/solid";
+import Link from "next/link";
+import Image from "next/image";
+import { formatToWon } from "@/lib/utils";
 
 async function getRoom(id: string) {
   const room = await db.chatRoom.findUnique({
@@ -14,6 +22,13 @@ async function getRoom(id: string) {
       users: {
         select: {
           id: true,
+        },
+      },
+      product: {
+        select: {
+          price: true,
+          title: true,
+          photo: true,
         },
       },
     },
@@ -71,10 +86,24 @@ const getCachedUserProfile = nextCache(getUserProfile, ["userProfile"], {
 });
 
 export type InitialChatMessages = Prisma.PromiseReturnType<typeof getMessages>;
+type RoomType = {
+  product: {
+    title: string;
+    price: number;
+    photo: string;
+  };
+  users: {
+    id: number;
+  }[];
+  id: string;
+  created_at: Date;
+  updated_at: Date;
+  productId: number;
+};
 
 export default async function Chat({ params }: { params: { id: string } }) {
   const session = await getSession();
-  const room = await getRoom(params.id);
+  const room = (await getRoom(params.id)) as RoomType;
   if (!room) {
     return notFound();
   }
@@ -84,7 +113,43 @@ export default async function Chat({ params }: { params: { id: string } }) {
   }
   const initialMessages = await getCachedMessages(params.id);
   return (
-    <div>
+    <div className="w-full">
+      <div className=" p-4  fixed top-0 left-0 w-full border-neutral-700 border-b">
+        <div className="flex justify-between items-center ">
+          <Link href={"/chats"}>
+            <ChevronLeftIcon className="size-6 text-white" />
+          </Link>
+          <span className="font-semibold text-lg">{user.username}</span>
+          <EllipsisVerticalIcon className="size-6" />
+        </div>
+        <div className="flex pt-3 gap-4">
+          <div className="size-10 relative rounded-md overflow-hidden">
+            <Image
+              src={`${room.product.photo}/w=100,h=100`}
+              alt={room.product.title}
+              fill
+              className=" object-cover"
+            />
+          </div>
+          <div className="flex flex-col *:text-sm">
+            <div className="flex gap-2">
+              <span className="font-semibold flex items-center">
+                거래완료{" "}
+                <ChevronDownIcon className="size-4 font-bold text-white" />
+              </span>
+              <span className="text-neutral-400 font-semibold">
+                {room.product.title}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              <span className="font-semibold">
+                {formatToWon(room.product.price)}원
+              </span>
+              <span className="text-neutral-500">{"(가격제안불가)"}</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <ChatMessagesList
         chatRoomId={params.id}
         username={user.username}

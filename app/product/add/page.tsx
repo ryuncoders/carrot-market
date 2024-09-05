@@ -25,7 +25,7 @@ export default function AddProduct() {
   const onValid = async () => {
     await onSubmit();
   };
-
+  console.log("this page is add product");
   // image valid
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {

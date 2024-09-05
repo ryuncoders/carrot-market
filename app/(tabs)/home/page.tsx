@@ -49,7 +49,7 @@ export default async function Products() {
         </button>
       </form>
       <Link
-        href="/products/add"
+        href="/product/add"
         className="size-16 bg-main-color text-white flex justify-center items-center rounded-full fixed bottom-24 right-8 transition-colors hover:bg-orange-400"
       >
         <PlusIcon className="size-10" />

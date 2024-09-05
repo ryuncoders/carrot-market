@@ -15,7 +15,6 @@ export default async function ProductEdit({
 }) {
   const product = await getCahcedProduct(+id);
   const isOwner = Boolean(getIsOwner(product?.userId!));
-
   return (
     <>
       {product ? (

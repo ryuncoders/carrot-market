@@ -23,7 +23,7 @@ export default function ListProduct({
         <Image
           fill
           className="object-cover"
-          src={`${photo}/w=100,h=100`}
+          src={`${photo}/w=300,h=300`}
           alt={title}
         />
       </div>

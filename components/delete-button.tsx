@@ -8,10 +8,10 @@ interface DeleteBtnProps {
 }
 
 export default function DeleteBtn({ id }: DeleteBtnProps) {
-  const onClick = () => {
+  const onClick = async () => {
     const result = confirm("삭제하시겠습니까?");
     if (result) {
-      onDelete(+id);
+      await onDelete(+id);
     } else {
       return;
     }

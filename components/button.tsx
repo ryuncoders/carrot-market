@@ -6,6 +6,7 @@ interface BtnProps {
 }
 export default function Button({ text }: BtnProps) {
   const { pending } = useFormStatus();
+
   return (
     <button
       type="submit"

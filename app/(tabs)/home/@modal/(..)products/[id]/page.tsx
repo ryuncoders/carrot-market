@@ -5,7 +5,7 @@ import { formatToDate, formatToWon } from "@/lib/utils";
 import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
-import { getProduct } from "./action";
+import { getProduct } from "./actions";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const product = await getProduct(Number(params.id));
@@ -68,7 +68,7 @@ export default async function InterceptRoutes({
                   <div className="font-semibold text-lg">
                     {formatToWon(product.price)}원
                   </div>
-                  <div className="flex gap-2 ">
+                  <div className="flex gap-2 items-center">
                     {isOwner ? (
                       <>
                         <DeleteBtn id={params.id} />

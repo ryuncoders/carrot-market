@@ -1,6 +1,6 @@
 "use server";
 
-import { productSchema } from "../../add/schema";
+import { productSchema } from "../../../product/add/schema";
 import db from "@/lib/db";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";

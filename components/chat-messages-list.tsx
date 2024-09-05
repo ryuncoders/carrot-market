@@ -2,7 +2,7 @@
 
 import { createMessage } from "@/app/chats/[id]/actions";
 import { InitialChatMessages } from "@/app/chats/[id]/page";
-import { formatToDate, formatToTime, formatToTimeAgo } from "@/lib/utils";
+import { formatToTime } from "@/lib/utils";
 import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
 import { createClient, RealtimeChannel } from "@supabase/supabase-js";
 import Image from "next/image";

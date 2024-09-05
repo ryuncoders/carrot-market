@@ -4,12 +4,7 @@ import {
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
 
-export default function HomeLayout({
-  children,
-}: {
-  children: React.ReactNode;
-  modal: React.ReactNode;
-}) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <div className="flex justify-between items-center px-4 py-3 border-b border-b-neutral-600">

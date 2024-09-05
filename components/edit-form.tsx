@@ -4,12 +4,13 @@ import editHandle from "@/app/products/[id]/edit/action";
 import Input from "./input";
 import Button from "./button";
 import React, { useState } from "react";
-import { getUploadURL } from "@/app/products/add/actions";
+import { getUploadURL } from "@/app/product/add/actions";
 import { useForm } from "react-hook-form";
-import { productSchema, ProductType } from "@/app/products/add/schema";
+import { productSchema, ProductType } from "@/app/product/add/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotFound from "@/app/not-found";
 import Image from "next/image";
+import { useFormStatus } from "react-dom";
 
 interface ProductProps {
   id: string;
@@ -22,12 +23,14 @@ interface ProductProps {
   isOwner: boolean;
 }
 
-export default function EditForm({
-  id,
-  product: { title, price, description, photo },
-  isOwner,
-}: ProductProps) {
-  const [preview, setPreview] = useState(photo);
+export default function EditForm({ id, product, isOwner }: ProductProps) {
+  const [title, setTitle] = useState(product.title);
+  const [description, setDescription] = useState(product.description);
+  const [price, setPrice] = useState(product.price);
+  const [photo, setPhoto] = useState(product.photo);
+  const { pending } = useFormStatus();
+
+  const [preview, setPreview] = useState(product.photo);
   const [errorMessage, setErrorMessage] = useState("");
   const [uploadURL, setUploadURL] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -40,8 +43,29 @@ export default function EditForm({
     resolver: zodResolver(productSchema),
   });
   const onValid = async () => {
+    console.log("?");
     await onSubmit();
   };
+
+  const onTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {
+      target: { value },
+    } = event;
+    setTitle(value);
+  };
+  const onDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {
+      target: { value },
+    } = event;
+    setDescription(value);
+  };
+  const onPriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {
+      target: { value },
+    } = event;
+    setPrice(+value);
+  };
+
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -76,6 +100,7 @@ export default function EditForm({
     }
   };
   const onSubmit = handleSubmit(async (data: ProductType) => {
+    // onSubmit이 작동하지 않음
     if (!file) {
       return;
     }
@@ -126,25 +151,33 @@ export default function EditForm({
             <span>{errorMessage}</span>
             <Input
               {...register("title")}
+              onChange={onTitleChange}
               placeholder="제목"
               type="text"
               required
-              defaultValue={title}
+              value={title}
             />
             <Input
               {...register("price")}
+              onChange={onPriceChange}
               placeholder="가격"
-              type="text"
+              type="number"
               required
-              defaultValue={price}
+              value={price}
             />
             <Input
               {...register("description")}
+              onChange={onDescriptionChange}
               placeholder="자세한 설명"
               type="text"
-              defaultValue={description}
+              value={description}
             />
-            <Button text="수정완료" />
+            <button
+              type="submit"
+              className={`primary-btn text-base p-2 disabled:bg-neutral-500 disabled:cursor-not-allowed w-full`}
+            >
+              {pending ? "로딩 중 ..." : "수정완료"}
+            </button>
           </form>
         </div>
       ) : (

@@ -102,7 +102,7 @@ model ChatRoom {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  product   Product   @relation(fields: [productId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   users     User[]
   Message   Message[]
   productId Int
