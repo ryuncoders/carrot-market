@@ -1,7 +1,8 @@
+// button test
 "use client";
 
 import { useEffect } from "react";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 export default function Test() {
   const {
@@ -10,12 +11,10 @@ export default function Test() {
     formState: { errors, isDirty, isValid },
   } = useForm({ mode: "onChange" });
 
-  useEffect(() => {
-    console.log("isDirty:", isDirty, " isValid:", isValid);
-  }, [isDirty, isValid]);
-  const onValid = (data: any) => {
-    console.log(data);
+  const onValid = () => {
+    console.log("submit!");
   };
+
   return (
     <div className="flex items-center justify-center gap-2 h-screen">
       <form
