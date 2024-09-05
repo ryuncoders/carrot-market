@@ -1,50 +1,8 @@
-// button test
-"use client";
-
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
-export default function Test() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty, isValid },
-  } = useForm({ mode: "onChange" });
-
-  const onValid = () => {
-    console.log("submit!");
-  };
-
+export default function Extras() {
   return (
-    <div className="flex items-center justify-center gap-2 h-screen">
-      <form
-        onSubmit={handleSubmit(onValid)}
-        className="flex gap-2 items-center flex-col"
-      >
-        <input
-          className="text-black"
-          {...register("name", {
-            required: "Name is required",
-            validate: {
-              noAInName: (value) =>
-                !value.toLowerCase().includes("a") ||
-                'Name cannot contain the letter "a"',
-            },
-          })}
-          type="text"
-          placeholder="Enter your name"
-        />
-        {errors.name && <span>{errors.name.message + ""}</span>}
-        {isValid && isDirty ? (
-          <button
-            type="submit"
-            disabled={!isDirty || !isValid}
-            className="p-3 rounded-lg bg-neutral-600 text-white cursor-pointer"
-          >
-            Enter
-          </button>
-        ) : null}
-      </form>
+    <div className="flex flex-col gap-3 py-10 px-5">
+      <h1 className="text-6xl font-protest">Extras!</h1>
+      <h2 className="font-roboto">So much more to learn!</h2>
     </div>
   );
 }

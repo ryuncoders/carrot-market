@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        protest: "var(--font-protest)",
+        metallica: "var(--font-metallica)",
+      },
       colors: {
         "main-color": "rgb(249, 115, 22)",
       },

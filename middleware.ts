@@ -13,6 +13,7 @@ const publicOnlyUrls: Routes = {
   "/update": true,
   "/github/start": true,
   "/github/complete": true,
+  "/extras": true,
 };
 
 export async function middleware(request: NextRequest) {
