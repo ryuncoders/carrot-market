@@ -2,6 +2,8 @@ import Image from "next/image";
 import heavyImage from "../../public/heavyImage.jpg";
 
 export default function Extras() {
+  // public: 로드 전까지 blur 처리하기
+  // server: 이미지 불러오기 전까지 base64로 만든 이미지로 대체하기
   return (
     <div className="flex flex-col gap-3 py-10 px-5">
       {/* <Image alt="" src={heavyImage} placeholder="blur" /> */}
