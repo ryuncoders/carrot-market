@@ -1,31 +1,41 @@
 "use client";
 
-import Button from "@/components/button";
-import Input from "@/components/input";
+import { getUploadURL } from "@/app/product/add/actions";
+import { productSchema, ProductType } from "@/app/product/add/schema";
+import { updateHandle } from "@/app/products/[id]/edit/action";
 import { PhotoIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
-import { getUploadURL, uploadProduct } from "./actions";
-
-import { useForm } from "react-hook-form";
-import { productSchema, ProductType } from "./schema";
-
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 
-export default function AddProduct() {
-  const [preview, setPreview] = useState("");
+interface Product {
+  title: string;
+  price: number;
+  description: string;
+  photo: string;
+}
+
+export default function ProductEditForm({
+  initialProduct,
+  productId,
+}: {
+  initialProduct: Product;
+  productId: string;
+}) {
   const [errorMessage, setErrorMessage] = useState("");
+  const [file, setFile] = useState<File | null>();
   const [uploadURL, setUploadURL] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+
+  const [preview, setPreview] = useState(initialProduct.photo);
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm<ProductType>({ resolver: zodResolver(productSchema) });
-  const onValid = async () => {
-    await onSubmit();
-  };
-  // image valid
+
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { files },
@@ -39,33 +49,40 @@ export default function AddProduct() {
       setErrorMessage("사진이 아닙니다. 다시 선택해주세요.");
       return;
     }
+
     const fileSize = file.size;
     const MB = 1024 * 1024;
     if (fileSize > MB * 3) {
-      setErrorMessage("사진의 크기가 3MB이하여야 합니다.");
+      setErrorMessage("사진의 크기가 3MB 이하여야 합니다.");
       return;
     }
+
     const url = URL.createObjectURL(file);
-    setPreview(url);
     setFile(file);
+    setPreview(url);
 
     const { success, result } = await getUploadURL();
+
     if (success) {
       const { id, uploadURL } = result;
-      setUploadURL(uploadURL);
+      console.log("result", result);
       setValue(
         "photo",
         `https://imagedelivery.net/XnCI-r_Qme1s5loDFzOTkg/${id}`
       );
+      setUploadURL(uploadURL);
     }
   };
 
-  // image submit
+  const onValid = async () => {
+    await onSubmit();
+  };
+
   const onSubmit = handleSubmit(async (data: ProductType) => {
     if (!file) {
       return;
     }
-    // upload photo to cloudflare
+
     const cloudflareForm = new FormData();
     cloudflareForm.append("file", file);
     const response = await fetch(uploadURL, {
@@ -75,66 +92,67 @@ export default function AddProduct() {
     if (response.status !== 200) {
       return;
     }
-    // send data to zod
+
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("price", data.price + "");
     formData.append("description", data.description);
     formData.append("photo", data.photo);
-    return uploadProduct(formData);
+    return updateHandle(formData, +productId);
   });
 
+  // const [state, formAction] = useFormState(onSubmit, null);
+
   return (
-    <div>
-      <form action={onValid} className="p-5 flex flex-col gap-5">
+    <div className="py-10 px-3">
+      <form
+        action={onValid}
+        className="flex flex-col gap-2 w-full *:text-black"
+      >
         <label
           htmlFor="photo"
-          className="bg-center bg-cover border-2 aspect-square flex justify-center items-center flex-col border-dashed cursor-pointer rounded-md"
-          style={{
-            backgroundImage: `url(${preview})`,
-          }}
+          className="relative rounded-md border-dashed cursor-pointer aspect-square  border-2 flex justify-center items-center "
         >
-          {preview === "" ? (
-            <>
-              <PhotoIcon className="w-20" />
-              <div className="text-neutral-400 text-sm">
-                사진을 추가해주세요.
-                {errors.photo?.message}
-              </div>
-            </>
-          ) : null}
+          <Image
+            fill
+            className="object-cover"
+            src={
+              preview.includes("imagedelivery")
+                ? `${preview}/public`
+                : `${preview}`
+            }
+            alt={initialProduct.title}
+          />
         </label>
         <input
-          onChange={onImageChange}
-          type="file"
           id="photo"
-          name="photo"
+          type="file"
           accept="image/*"
+          onChange={onImageChange}
           className="hidden"
         />
         <span>{errorMessage}</span>
-        <Input
+        <input
           {...register("title")}
-          errors={[errors.title?.message ?? ""]}
-          required
+          type="text"
           placeholder="제목"
-          type="text"
+          defaultValue={initialProduct.title}
         />
-        <Input
-          {...register("price")}
-          errors={[errors.price?.message ?? ""]}
-          required
-          placeholder="가격"
+        <input
           type="number"
+          placeholder="가격"
+          {...register("price")}
+          defaultValue={initialProduct.price}
         />
-        <Input
+        <input
           {...register("description")}
-          errors={[errors.description?.message ?? ""]}
-          required
-          placeholder="자세한 설명"
           type="text"
+          placeholder="상세내용"
+          defaultValue={initialProduct.description}
         />
-        <Button text="작성 완료" />
+        <button type="submit" className="bg-orange-500 p-3 rounded-lg">
+          수정 완료
+        </button>
       </form>
     </div>
   );

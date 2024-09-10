@@ -64,22 +64,40 @@ export const onDelete = async (id: number) => {
       photo: true,
     },
   });
+
+  //https://imagedelivery.net/XnCI-r_Qme1s5loDFzOTkg/0f4b9424-c0ea-4276-dd9a-127d9952f700
   const photoId = product.photo.split(
-    "https://imagedelivery.net/WsRbszCcxsT0fi684EYNNQ/"
+    `https://imagedelivery.net/${process.env.CLOUDFLARE_ACCOUNT_HASH}/`
   )[1];
-  await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ID}/images/v1/${photoId}`,
+
+  console.log("photoId", photoId);
+  // await fetch(
+  //   `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ID}/images/v1/${photoId}`,
+  //   {
+  //     method: "DELETE",
+  //     headers: {
+  //       Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }
+  // );
+
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ID}/images/v2/${photoId}/direct_delete`,
     {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
       },
     }
   );
+  const data = await response.json();
+  const { success, result } = data;
+  console.log(success);
+
   revalidatePath("/home");
   revalidateTag("product-detail");
-  return redirect("/home");
+  redirect("/home");
 };
 
 export async function getProduct(id: number) {

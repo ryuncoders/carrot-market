@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function createMessage(payload: string, chatRoomId: string) {
   const session = await getSession();
@@ -17,5 +17,7 @@ export async function createMessage(payload: string, chatRoomId: string) {
     },
   });
   revalidateTag("messages");
+  revalidatePath(`chats/${chatRoomId}`);
   revalidateTag("chats-message");
+  console.log("여기까지 얼마나 걸리는지 확인");
 }

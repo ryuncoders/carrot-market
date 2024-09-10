@@ -1,28 +1,45 @@
-import EditForm from "@/components/edit-form";
+import db from "@/lib/db";
+import ProductEditForm from "@/components/product-edit-form";
+import { notFound } from "next/navigation";
+import getSession from "@/lib/session/get";
 
-import NotFound from "@/app/not-found";
-import { unstable_cache as nextCache } from "next/cache";
-import { getIsOwner, getProduct } from "../actions";
-
-const getCahcedProduct = nextCache(getProduct, ["product-detail"], {
-  tags: ["product-details"],
-});
+async function getProduct(id: number) {
+  const product = db.product.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      userId: true,
+      title: true,
+      price: true,
+      description: true,
+      photo: true,
+    },
+  });
+  return product;
+}
 
 export default async function ProductEdit({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const product = await getCahcedProduct(+id);
-  const isOwner = Boolean(getIsOwner(product?.userId!));
+  const product = await getProduct(+id);
+  const session = await getSession();
+  if (session.id !== product?.userId) {
+    return notFound();
+  }
+  if (!product) {
+    return notFound();
+  }
   return (
     <>
       {product ? (
-        <>
-          <EditForm id={id} product={product} isOwner={isOwner} />
-        </>
+        <div>
+          <ProductEditForm initialProduct={product} productId={id} />
+        </div>
       ) : (
-        <NotFound />
+        notFound
       )}
     </>
   );

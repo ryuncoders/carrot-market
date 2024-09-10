@@ -1,5 +1,4 @@
 import InitialChat from "@/components/initial-chat";
-import ListMessage from "@/components/listChat";
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
 import { Prisma } from "@prisma/client";

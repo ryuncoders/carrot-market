@@ -64,7 +64,7 @@ async function getMessages(chatRoomId: string) {
   return messages;
 }
 
-const getCachedMessages = nextCache(getMessages, ["chat-messages"], {
+const getCachedMessages = nextCache(getMessages, ["messages"], {
   tags: ["messages"],
 });
 
@@ -114,7 +114,7 @@ export default async function Chat({ params }: { params: { id: string } }) {
   const initialMessages = await getCachedMessages(params.id);
   return (
     <div className="w-full">
-      <div className=" p-4  fixed top-0 left-0 w-full border-neutral-700 border-b">
+      <div className=" p-4  fixed top-0 left-0 w-full border-neutral-700 border-b bg-neutral-900">
         <div className="flex justify-between items-center ">
           <Link href={"/chats"}>
             <ChevronLeftIcon className="size-6 text-white" />

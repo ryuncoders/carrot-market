@@ -11,6 +11,7 @@ const config: Config = {
       fontFamily: {
         protest: "var(--font-protest)",
         metallica: "var(--font-metallica)",
+        gasoek: "var(--font-gasoek)",
       },
       colors: {
         "main-color": "rgb(249, 115, 22)",

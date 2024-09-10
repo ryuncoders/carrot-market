@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Protest_Guerrilla } from "next/font/google";
+import { Inter, Protest_Guerrilla, Gasoek_One } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -10,6 +10,13 @@ const protest = Protest_Guerrilla({
   style: "normal",
   subsets: ["latin"],
   variable: "--font-protest",
+});
+
+const gasoek = Gasoek_One({
+  weight: "400",
+  style: "normal",
+  subsets: ["latin"],
+  variable: "--font-gasoek",
 });
 
 const metallica = localFont({
@@ -33,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-neutral-900">
       <body
-        className={`${inter.className} ${metallica.variable} ${protest.variable} text-white h-screen max-w-screen-sm mx-auto`}
+        className={`${inter.className} ${metallica.variable} ${protest.variable} ${gasoek.variable} text-white h-screen max-w-screen-sm mx-auto`}
       >
         {children}
       </body>
