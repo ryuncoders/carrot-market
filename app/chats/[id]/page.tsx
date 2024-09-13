@@ -29,6 +29,7 @@ async function getRoom(id: string) {
           price: true,
           title: true,
           photo: true,
+          state: true,
         },
       },
     },
@@ -134,7 +135,7 @@ export default async function Chat({ params }: { params: { id: string } }) {
           <div className="flex flex-col *:text-sm">
             <div className="flex gap-2">
               <span className="font-semibold flex items-center">
-                거래완료{" "}
+                {"거래완료"}
                 <ChevronDownIcon className="size-4 font-bold text-white" />
               </span>
               <span className="text-neutral-400 font-semibold">

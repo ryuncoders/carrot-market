@@ -1,6 +1,7 @@
 import Review from "@/components/review";
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
+import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import { ChevronRightIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
@@ -60,7 +61,7 @@ export default async function Profile() {
       <div className="flex  flex-col gap-3">
         <div className="flex px-5 py-3 border-b border-neutral-600 justify-between items-center">
           <span className="font-bold text-lg">프로필</span>
-          <Cog6ToothIcon className="size-7" />
+          <FaceSmileIcon className="size-7" />
         </div>
         <div className="p-5 flex flex-col gap-3">
           <Suspense fallback={"user"}>
@@ -74,7 +75,10 @@ export default async function Profile() {
           </Link>
         </div>
         <div className="flex flex-col *:w-full *:text-white *:border-b *:border-neutral-600 *:p-3">
-          <Link className="flex items-center justify-between" href={"/"}>
+          <Link
+            className="flex items-center justify-between"
+            href={"/profile/products"}
+          >
             <span>판매물품 {user.product.length}개</span>
 
             <ChevronRightIcon className="size-6 font-bold" />

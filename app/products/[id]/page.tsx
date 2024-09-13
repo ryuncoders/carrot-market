@@ -77,23 +77,25 @@ export default async function productDeail({
         <span className="font-semibold text-xl">
           {formatToWon(product.price)}원
         </span>
-        {isOwner ? (
-          <>
-            <DeleteBtn id={params.id} />
-            <Link
-              href={`/products/${params.id}/edit`}
-              className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
-            >
-              수정하기
-            </Link>
-          </>
-        ) : (
-          <form action={onClickChatHandle}>
-            <button className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold">
-              채팅하기
-            </button>
-          </form>
-        )}
+        <div className="flex gap-2 items-center">
+          {isOwner ? (
+            <>
+              <DeleteBtn id={params.id} />
+              <Link
+                href={`/products/${params.id}/edit`}
+                className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold"
+              >
+                수정하기
+              </Link>
+            </>
+          ) : (
+            <form action={onClickChatHandle}>
+              <button className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold">
+                채팅하기
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

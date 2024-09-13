@@ -25,6 +25,7 @@ export async function uploadProduct(formData: FormData) {
         description: result.data.description,
         price: result.data.price,
         photo: result.data.photo,
+        state: "ON_SALE",
         user: {
           connect: {
             id: session.id,

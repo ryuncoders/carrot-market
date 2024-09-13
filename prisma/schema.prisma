@@ -42,16 +42,23 @@ model SMSToken {
   userId     Int
 }
 
+enum ProductState {
+  ON_SALE // 판매중
+  COMPLETED // 거래완료
+  HIDDEN // 숨김
+}
+
 model Product {
-  id          Int        @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   title       String
   price       Float
   description String
   photo       String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
   userId      Int
+  state       ProductState
   chatRoom    ChatRoom[]
 }
 
