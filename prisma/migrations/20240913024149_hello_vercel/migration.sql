@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "ProductState" AS ENUM ('ON_SALE', 'COMPLETED', 'HIDDEN');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -34,6 +37,7 @@ CREATE TABLE "Product" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER NOT NULL,
+    "state" "ProductState" NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
