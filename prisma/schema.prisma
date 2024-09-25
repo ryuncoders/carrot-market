@@ -31,6 +31,7 @@ model User {
   like       Like[]
   chat_room  ChatRoom[]
   message    Message[]
+  Review     Review[]
 }
 
 model SMSToken {
@@ -60,6 +61,7 @@ model Product {
   userId      Int
   state       ProductState
   chatRoom    ChatRoom[]
+  Review      Review[]
 }
 
 model Post {
@@ -128,4 +130,19 @@ model Message {
 
   chatRoomId String
   userId     Int
+}
+
+model Review {
+  payload String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  userId    Int
+  productId Int
+
+  @@id(name: "id", [userId, productId])
 }

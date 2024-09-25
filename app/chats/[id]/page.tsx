@@ -2,16 +2,19 @@ import ChatMessagesList from "@/components/chat-messages-list";
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
 import { Prisma } from "@prisma/client";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { unstable_cache as nextCache } from "next/cache";
 import {
-  ChevronDownIcon,
   ChevronLeftIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import Image from "next/image";
 import { formatToWon } from "@/lib/utils";
+import SelectState from "@/components/select-state";
+import ReviewButton from "@/components/review-button";
+import { Suspense } from "react";
+import Review from "@/app/product/review/page";
 
 async function getRoom(id: string) {
   const room = await db.chatRoom.findUnique({
@@ -26,6 +29,7 @@ async function getRoom(id: string) {
       },
       product: {
         select: {
+          userId: true,
           price: true,
           title: true,
           photo: true,
@@ -86,12 +90,20 @@ const getCachedUserProfile = nextCache(getUserProfile, ["userProfile"], {
   tags: ["userProfile"],
 });
 
+const stateKo = {
+  ON_SALE: "판매중",
+  COMPLETED: "거래완료",
+  HIDDEN: "숨김",
+};
+
 export type InitialChatMessages = Prisma.PromiseReturnType<typeof getMessages>;
 type RoomType = {
   product: {
     title: string;
     price: number;
     photo: string;
+    state: "ON_SALE" | "HIDDEN" | "COMPLETED";
+    userId: number;
   };
   users: {
     id: number;
@@ -102,17 +114,56 @@ type RoomType = {
   productId: number;
 };
 
+async function getReviewUser(productId: number, userId: number) {
+  const review = await db.review.findUnique({
+    where: {
+      id: {
+        productId,
+        userId,
+      },
+    },
+    select: {
+      userId: true,
+      payload: true,
+    },
+  });
+  return review;
+}
+
 export default async function Chat({ params }: { params: { id: string } }) {
   const session = await getSession();
   const room = (await getRoom(params.id)) as RoomType;
+
+  const receivedReview = await getReviewUser(room.productId, session.id!);
+
+  const other = room.users.filter((user) => user.id !== session.id);
+  const writeReveiw = await getReviewUser(room.productId, other[0].id);
+
+  if (room.product.state == "COMPLETED" && receivedReview?.userId) {
+    // review 썼는지 확인하기
+    if (!writeReveiw?.userId) {
+      return (
+        <Review
+          seller={other[0].id}
+          payload={receivedReview.payload}
+          productId={room.productId}
+          chatRoomId={params.id}
+        />
+      );
+    }
+  }
   if (!room) {
     return notFound();
   }
+
   const user = await getCachedUserProfile(session.id!);
+
   if (!user) {
     return notFound();
   }
+
   const initialMessages = await getCachedMessages(params.id);
+  const otherUser = await getUserProfile(other[0].id);
   return (
     <div className="w-full">
       <div className=" p-4  fixed top-0 left-0 w-full border-neutral-700 border-b bg-neutral-900">
@@ -120,7 +171,9 @@ export default async function Chat({ params }: { params: { id: string } }) {
           <Link href={"/chats"}>
             <ChevronLeftIcon className="size-6 text-white" />
           </Link>
-          <span className="font-semibold text-lg">{user.username}</span>
+          <Suspense>
+            <span className="font-semibold text-lg">{otherUser?.username}</span>
+          </Suspense>
           <EllipsisVerticalIcon className="size-6" />
         </div>
         <div className="flex pt-3 gap-4">
@@ -135,8 +188,16 @@ export default async function Chat({ params }: { params: { id: string } }) {
           <div className="flex flex-col *:text-sm">
             <div className="flex gap-2">
               <span className="font-semibold flex items-center">
-                {"거래완료"}
-                <ChevronDownIcon className="size-4 font-bold text-white" />
+                {session.id === room.product.userId ? (
+                  <>
+                    <SelectState
+                      state={room.product.state}
+                      productId={room.productId}
+                    />
+                  </>
+                ) : (
+                  <span>{stateKo[room.product.state]}</span>
+                )}
               </span>
               <span className="text-neutral-400 font-semibold">
                 {room.product.title}
@@ -146,7 +207,20 @@ export default async function Chat({ params }: { params: { id: string } }) {
               <span className="font-semibold">
                 {formatToWon(room.product.price)}원
               </span>
-              <span className="text-neutral-500">{"(가격제안불가)"}</span>
+              {writeReveiw?.userId ? (
+                <Link
+                  href={`/product/review/${room.productId}/${session.id}/received`}
+                >
+                  받은 후기 보기
+                </Link>
+              ) : (
+                <></>
+              )}
+              {session.id === room.product.userId ? (
+                <ReviewButton productId={room.productId} />
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </div>

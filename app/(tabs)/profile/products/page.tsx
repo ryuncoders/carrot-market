@@ -1,5 +1,7 @@
+import PersonalInitialProduct from "@/components/personal-initial-product";
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
+import { Prisma } from "@prisma/client";
 
 async function getProducts(userId: number) {
   const products = db.product.findMany({
@@ -14,10 +16,17 @@ async function getProducts(userId: number) {
       state: true,
     },
   });
+  return products;
 }
+
+export type InitialProducts = Prisma.PromiseReturnType<typeof getProducts>;
 
 export default async function ProductList() {
   const session = await getSession();
-  const products = await getProducts(session.id!);
-  return <div>product list</div>;
+  const initialProduct = await getProducts(session.id!);
+  return (
+    <div>
+      <PersonalInitialProduct initialProduct={initialProduct} />
+    </div>
+  );
 }

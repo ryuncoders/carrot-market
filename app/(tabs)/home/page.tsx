@@ -10,6 +10,9 @@ const getCachedProducts = nextCache(getInitialProducts, ["home-products"], {
 });
 async function getInitialProducts() {
   const products = await db.product.findMany({
+    where: {
+      state: "ON_SALE",
+    },
     select: {
       title: true,
       price: true,

@@ -56,8 +56,9 @@ async function Username() {
 
 export default async function Profile() {
   const user = await getUser();
+  console.log("this is profile");
   return (
-    <>
+    <div>
       <div className="flex  flex-col gap-3">
         <div className="flex px-5 py-3 border-b border-neutral-600 justify-between items-center">
           <span className="font-bold text-lg">프로필</span>
@@ -98,6 +99,6 @@ export default async function Profile() {
           </button>
         </form>
       </div>
-    </>
+    </div>
   );
 }
