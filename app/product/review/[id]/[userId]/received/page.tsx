@@ -22,5 +22,5 @@ export default async function Recieved({
   params: { id: string; userId: string };
 }) {
   const review = await getReview(+params.id, +params.userId);
-  return <ReceivedReview payload={review?.payload} />;
+  return <ReceivedReview payload={review?.payload!} />;
 }

@@ -2,7 +2,7 @@ import Review from "@/components/review";
 import db from "@/lib/db";
 import getSession from "@/lib/session/get";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { ChevronRightIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
+import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -35,6 +35,14 @@ const logOut = async () => {
   redirect("/");
 };
 
+function loading() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("done");
+    }, 10000); // 10초 대기
+  });
+}
+
 async function Username() {
   const user = await getUser();
   return (
@@ -55,8 +63,10 @@ async function Username() {
 }
 
 export default async function Profile() {
+  loading();
+
   const user = await getUser();
-  console.log("this is profile");
+
   return (
     <div>
       <div className="flex  flex-col gap-3">
