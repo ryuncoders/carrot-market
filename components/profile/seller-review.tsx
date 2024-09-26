@@ -45,8 +45,10 @@ export default function SellerReview({
     }
   };
 
-  const onSelectUser = () => {
+  const onSelectUser = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("?");
     router.push(`/product/review/${productId}/${selectUserId}`);
+    event.preventDefault();
   };
   const onNotSelectUser = () => {
     router.push("/home");

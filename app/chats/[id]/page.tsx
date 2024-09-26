@@ -213,10 +213,7 @@ export default async function Chat({ params }: { params: { id: string } }) {
                 >
                   받은 후기 보기
                 </Link>
-              ) : (
-                <></>
-              )}
-              {session.id === room.product.userId ? (
+              ) : session.id === room.product.userId ? (
                 <ReviewButton productId={room.productId} />
               ) : (
                 <></>

@@ -25,7 +25,19 @@ export async function createReview(
     },
   });
 
-  if (review.userId) {
+  const product = await db.product.update({
+    where: {
+      id: productId,
+    },
+    data: {
+      state: "COMPLETED",
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (review.userId && product.id) {
     return "success";
   } else {
     return "error";

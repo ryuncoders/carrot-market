@@ -14,6 +14,7 @@ export default function Review({
   chatRoomId,
   payload,
 }: ReviewProps) {
+  console.log(seller, productId, chatRoomId, payload);
   return (
     <div className="p-5 flex flex-col gap-3">
       <h1 className="text-lg font-semibold">거래가 완료된 방입니다.</h1>
